@@ -89,6 +89,9 @@ add_action( 'rcp_valid_ipn', 'cgc_rcp_mixpanel_tracking', 10, 3 );
 
 function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
+	if( ! function_exists( 'wp_mixpanel' ) || ! function_exists( 'rcp_get_subscription_name' ) )
+		return;
+
 	// We check for $_POST to make sure this only fires on the signup form
 	if( 'free' === $new_status && isset( $_POST['rcp_level'] ) ) {
 
@@ -165,7 +168,6 @@ function cgc_mixpanel_user_login( $user_login, $user ) {
 	$person_props['last_name']    = $user->last_name;
 	$person_props['user_login']   = $user->user_login;
 	$person_props['email']        = $user->user_email;
-	$person_props['subscription'] = rcp_get_subscription( $user->ID );
 
 	wp_mixpanel()->track_person( $user->ID, $person_props );
 
