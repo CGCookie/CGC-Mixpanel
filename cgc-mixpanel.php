@@ -40,7 +40,7 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 
 			$type = ! empty( $new_user ) ? 'Renewal' : 'New Signup';
 
-			wp_mixpanel()->track( $type, $event_props );
+			wp_mixpanel()->track_event( $type, $event_props );
 
 			$person_props['recurring'] = 'Yes';
 			wp_mixpanel()->track_person( $user_id, $person_props );
@@ -67,7 +67,7 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 
 				$type = ! empty( $new_user ) ? 'Renewal' : 'New Signup';
 
-				wp_mixpanel()->track( $type, $event_props );
+				wp_mixpanel()->track_event( $type, $event_props );
 
 				$trans_props = array(
 					'amount' => $payment_data['amount']
@@ -108,7 +108,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$event_props['distinct_id']  = $user_id;
 		$event_props['subscription'] = $subscription;
 
-		wp_mixpanel()->track( 'Free Signup', $event_props );
+		wp_mixpanel()->track_event( 'Free Signup', $event_props );
 
 	} else if( 'expired' === $new_status ) {
 
@@ -129,7 +129,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$event_props['distinct_id']  = $user_id;
 		$event_props['subscription'] = $subscription;
 
-		wp_mixpanel()->track( 'Expired Membership', $event_props );
+		wp_mixpanel()->track_event( 'Expired Membership', $event_props );
 
 	} elseif( 'cancelled' === $new_status ) {
 
@@ -150,7 +150,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$event_props['distinct_id']  = $user_id;
 		$event_props['subscription'] = $subscription;
 
-		wp_mixpanel()->track( 'Cancelled Membership', $event_props );
+		wp_mixpanel()->track_event( 'Cancelled Membership', $event_props );
 
 	}
 }
