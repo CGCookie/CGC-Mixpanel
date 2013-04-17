@@ -162,8 +162,10 @@ add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
 
 function cgc_mixpanel_user_login( $user_login, $user ) {
 
-	if( ! function_exists( 'wp_mixpanel' ) )
+	if( ! class_exists( 'WP_Mixpanel' ) )
 		return;
+
+	$mixpanel = WP_Mixpanel::instance();
 
 	$person_props                 = array();
 	$person_props['ip']           = cgc_mixpanel_get_ip();
@@ -178,7 +180,7 @@ function cgc_mixpanel_user_login( $user_login, $user ) {
 	$event_props['distinct_id']   = $user->ID;
 	$event_props['sign_on_page']  = cgc_mixpanel_get_current_page_url();
 
-	wp_mixpanel()->track_event( 'Login', $event_props );
+	$mixpanel->track_event( 'Login', $event_props );
 
 }
 add_action( 'wp_login', 'cgc_mixpanel_user_login', 10, 2 );
