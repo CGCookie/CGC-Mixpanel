@@ -162,6 +162,9 @@ add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
 
 function cgc_mixpanel_user_login( $user_login, $user ) {
 
+	if( ! function_exists( 'wp_mixpanel' ) )
+		return;
+
 	$person_props                 = array();
 	$person_props['ip']           = cgc_mixpanel_get_ip();
 	$person_props['first_name']   = $user->first_name;
