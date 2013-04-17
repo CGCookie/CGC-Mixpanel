@@ -178,7 +178,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 
 	$event_props                  = array();
 	$event_props['distinct_id']   = $user_id;
-	$event_props['sign_on_page']  = cgc_mixpanel_get_current_page_url();
+	$event_props['sign_on_page']  = $_SERVER['HTTP_REFERER'];
 
 	wp_mixpanel()->track_event( 'Login', $event_props );
 
