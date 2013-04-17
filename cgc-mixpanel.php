@@ -155,3 +155,77 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 	}
 }
 add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
+
+
+function cgc_mixpanel_user_login( $user_login, $user ) {
+
+	$person_props                 = array();
+	$person_props['ip']           = cgc_mixpanel_get_ip();
+	$person_props['first_name']   = $user->first_name;
+	$person_props['last_name']    = $user->last_name;
+	$person_props['user_login']   = $user->user_login;
+	$person_props['email']        = $user->user_email;
+	$person_props['subscription'] = rcp_get_subscription( $user_id );
+
+	wp_mixpanel()->track_person( $user_id, $person_props );
+
+	$event_props                  = array();
+	$event_props['distinct_id']   = $user_id;
+	$event_props['sign_on_page']  = cgc_mixpanel_get_current_page_url();
+
+	wp_mixpanel()->track_event( 'Login', $event_props );
+
+}
+add_action( 'wp_login', 'cgc_mixpanel_user_login'10, 2 );
+
+
+/**
+ * Get User IP
+ *
+ * Returns the IP address of the current visitor
+ *
+ * @since 1.0.8.2
+ * @return string $ip User's IP address
+*/
+function cgc_mixpanel_get_ip() {
+	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		//check ip from share internet
+	  $ip = $_SERVER['HTTP_CLIENT_IP'];
+	} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		//to check ip is pass from proxy
+	  $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	} else {
+	  $ip = $_SERVER['REMOTE_ADDR'];
+	}
+	return $ip;
+}
+
+
+/**
+ * Get the current page URL
+ *
+ * @since 1.3
+ * @global $post
+ * @return string $page_url Current page URL
+ */
+function cgc_mixpanel_get_current_page_url() {
+	global $post;
+
+	if ( is_front_page() ) :
+		$page_url = home_url();
+	else :
+		$page_url = 'http';
+
+		if ( isset( $_SERVER["HTTPS"] ) && $_SERVER["HTTPS"] == "on" )
+			$page_url .= "s";
+
+		$page_url .= "://";
+
+		if ( $_SERVER["SERVER_PORT"] != "80" )
+			$page_url .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+		else
+			$page_url .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+	endif;
+
+	return $page_url;
+}
