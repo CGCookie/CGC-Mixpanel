@@ -165,12 +165,12 @@ function cgc_mixpanel_user_login( $user_login, $user ) {
 	$person_props['last_name']    = $user->last_name;
 	$person_props['user_login']   = $user->user_login;
 	$person_props['email']        = $user->user_email;
-	$person_props['subscription'] = rcp_get_subscription( $user_id );
+	$person_props['subscription'] = rcp_get_subscription( $user->ID );
 
-	wp_mixpanel()->track_person( $user_id, $person_props );
+	wp_mixpanel()->track_person( $user->ID, $person_props );
 
 	$event_props                  = array();
-	$event_props['distinct_id']   = $user_id;
+	$event_props['distinct_id']   = $user->ID;
 	$event_props['sign_on_page']  = cgc_mixpanel_get_current_page_url();
 
 	wp_mixpanel()->track_event( 'Login', $event_props );
