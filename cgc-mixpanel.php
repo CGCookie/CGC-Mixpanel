@@ -160,12 +160,12 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
 
 
-function cgc_mixpanel_user_login( $user_login, $user ) {
+function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user_id, $status = 'logged_in' ) {
 
 	if( ! class_exists( 'WP_Mixpanel' ) )
 		return;
 
-	$mixpanel = WP_Mixpanel::instance();
+	$user                         = get_userdata( $user_id );
 
 	$person_props                 = array();
 	$person_props['ip']           = cgc_mixpanel_get_ip();
@@ -174,16 +174,16 @@ function cgc_mixpanel_user_login( $user_login, $user ) {
 	$person_props['user_login']   = $user->user_login;
 	$person_props['email']        = $user->user_email;
 
-	wp_mixpanel()->track_person( $user->ID, $person_props );
+	wp_mixpanel()->track_person( $user_id, $person_props );
 
 	$event_props                  = array();
-	$event_props['distinct_id']   = $user->ID;
+	$event_props['distinct_id']   = $user_id;
 	$event_props['sign_on_page']  = cgc_mixpanel_get_current_page_url();
 
-	$mixpanel->track_event( 'Login', $event_props );
+	wp_mixpanel()->track_event( 'Login', $event_props );
 
 }
-add_action( 'wp_login', 'cgc_mixpanel_user_login', 10, 2 );
+add_action( 'set_auth_cookie', 'cgc_mixpanel_user_login', 10, 5 );
 
 
 /**
