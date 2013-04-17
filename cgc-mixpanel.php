@@ -22,7 +22,7 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 	$person_props['first_name']   = $user->first_name;
 	$person_props['last_name']    = $user->last_name;
 	$person_props['user_login']   = $user->user_login;
-	$person_props['user_email']   = $user->user_email;
+	$person_props['email']        = $user->user_email;
 	$person_props['subscription'] = $subscription;
 	$person_props['status']       = 'Active';
 
@@ -98,7 +98,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['first_name']   = $user->first_name;
 		$person_props['last_name']    = $user->last_name;
 		$person_props['user_login']   = $user->user_login;
-		$person_props['user_email']   = $user->user_email;
+		$person_props['email']        = $user->user_email;
 		$person_props['subscription'] = rcp_get_subscription( $user_id );
 		$person_props['status']       = 'free';
 
@@ -118,7 +118,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['first_name']   = $user->first_name;
 		$person_props['last_name']    = $user->last_name;
 		$person_props['user_login']   = $user->user_login;
-		$person_props['user_email']   = $user->user_email;
+		$person_props['email']        = $user->user_email;
 		$person_props['subscription'] = rcp_get_subscription( $user_id );
 		$person_props['status']       = 'Expired';
 		$person_props['recurring']    = 'No';
@@ -139,7 +139,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['first_name']   = $user->first_name;
 		$person_props['last_name']    = $user->last_name;
 		$person_props['user_login']   = $user->user_login;
-		$person_props['user_email']   = $user->user_email;
+		$person_props['email']        = $user->user_email;
 		$person_props['subscription'] = rcp_get_subscription( $user_id );
 		$person_props['status']       = 'Cancelled';
 		$person_props['recurring']    = 'No';
