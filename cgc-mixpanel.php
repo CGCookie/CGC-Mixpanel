@@ -154,4 +154,4 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 	}
 }
-add_action( 'rcp_set_status', 'cgc_rcp_track_free_signup', 10, 2 );
+add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
