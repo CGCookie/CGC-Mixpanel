@@ -23,7 +23,8 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 		$props['subscription'] = rcp_get_subscription( $user_id );
 		$props['signup_date']  = $payment_data['date'];
 
-		wp_mixpanel()->track( 'RCP Signup', $props );
+		//wp_mixpanel()->track( 'RCP Signup', $props );
+		//wp_mixpanel()->track_person( $user_id, $props );
 
 	}
 }
