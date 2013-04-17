@@ -176,7 +176,7 @@ function cgc_mixpanel_user_login( $user_login, $user ) {
 	wp_mixpanel()->track_event( 'Login', $event_props );
 
 }
-add_action( 'wp_login', 'cgc_mixpanel_user_login'10, 2 );
+add_action( 'wp_login', 'cgc_mixpanel_user_login', 10, 2 );
 
 
 /**
