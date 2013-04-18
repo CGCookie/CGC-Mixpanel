@@ -38,7 +38,7 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 			$event_props['distinct_id']  = $user_id;
 			$event_props['subscription'] = $subscription;
 
-			$type = ! empty( $new_user ) ? 'Renewal' : 'New Signup';
+			$type = ! empty( $new_user ) ? 'Citizen Renewal' : 'New Citizen Signup';
 
 			wp_mixpanel()->track_event( $type, $event_props );
 
@@ -55,6 +55,13 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 			);
 			wp_mixpanel()->track_transaction( $user_id, $trans_props );
 
+			$event_props                 = array();
+			$event_props['distinct_id']  = $user_id;
+			$event_props['subscription'] = $subscription;
+			$event_props['amount']       = $payment_data['amount'];
+
+			wp_mixpanel()->track_event( 'Subscription Payment', $event_props );
+
 			break;
 
 		case 'web_accept' :
@@ -65,7 +72,7 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 				$event_props['distinct_id']  = $user_id;
 				$event_props['subscription'] = $subscription;
 
-				$type = ! empty( $new_user ) ? 'Renewal' : 'New Signup';
+				$type = ! empty( $new_user ) ? 'Citizen Renewal' : 'New Citizen Signup';
 
 				wp_mixpanel()->track_event( $type, $event_props );
 
