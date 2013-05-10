@@ -37,6 +37,7 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 			$event_props                 = array();
 			$event_props['distinct_id']  = $user_id;
 			$event_props['subscription'] = $subscription;
+			$event_props['date']         = time();
 
 			$type = ! empty( $new_user ) ? 'Citizen Renewal' : 'New Citizen Signup';
 
@@ -59,6 +60,7 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 			$event_props['distinct_id']  = $user_id;
 			$event_props['subscription'] = $subscription;
 			$event_props['amount']       = $payment_data['amount'];
+			$event_props['date']         = time();
 
 			wp_mixpanel()->track_event( 'Subscription Payment', $event_props );
 
@@ -71,6 +73,7 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 				$event_props                 = array();
 				$event_props['distinct_id']  = $user_id;
 				$event_props['subscription'] = $subscription;
+				$event_props['date']         = time();
 
 				$type = ! empty( $new_user ) ? 'Citizen Renewal' : 'New Citizen Signup';
 
@@ -117,6 +120,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
 		$event_props['subscription'] = rcp_get_subscription( $user_id );
+		$event_props['date']         = time();
 
 		wp_mixpanel()->track_event( 'Free Signup', $event_props );
 
@@ -138,6 +142,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
 		$event_props['subscription'] = rcp_get_subscription( $user_id );
+		$event_props['date']         = time();
 
 		wp_mixpanel()->track_event( 'Expired Membership', $event_props );
 
@@ -159,6 +164,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
 		$event_props['subscription'] = rcp_get_subscription( $user_id );
+		$event_props['date']         = time();
 
 		wp_mixpanel()->track_event( 'Cancelled Membership', $event_props );
 
@@ -186,6 +192,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$event_props                  = array();
 	$event_props['distinct_id']   = $user_id;
 	$event_props['sign_on_page']  = $_SERVER['HTTP_REFERER'];
+	$event_props['date']          = time();
 
 	wp_mixpanel()->track_event( 'Login', $event_props );
 
