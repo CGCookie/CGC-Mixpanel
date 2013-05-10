@@ -116,7 +116,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
-		$event_props['subscription'] = $subscription;
+		$event_props['subscription'] = rcp_get_subscription( $user_id );
 
 		wp_mixpanel()->track_event( 'Free Signup', $event_props );
 
@@ -137,7 +137,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
-		$event_props['subscription'] = $subscription;
+		$event_props['subscription'] = rcp_get_subscription( $user_id );
 
 		wp_mixpanel()->track_event( 'Expired Membership', $event_props );
 
@@ -158,7 +158,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
-		$event_props['subscription'] = $subscription;
+		$event_props['subscription'] = rcp_get_subscription( $user_id );
 
 		wp_mixpanel()->track_event( 'Cancelled Membership', $event_props );
 
