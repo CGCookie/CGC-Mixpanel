@@ -188,9 +188,10 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
 		$event_props['subscription'] = rcp_get_subscription( $user_id );
+		$event_props['reason']       = 'Expired';
 		$event_props['date']         = time();
 
-		wp_mixpanel()->track_event( 'Expired Membership', $event_props );
+		wp_mixpanel()->track_event( 'Lost Citizen', $event_props );
 
 	} elseif( 'cancelled' === $new_status ) {
 
@@ -210,9 +211,10 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
 		$event_props['subscription'] = rcp_get_subscription( $user_id );
+		$event_props['reason']       = 'Cancelled';
 		$event_props['date']         = time();
 
-		wp_mixpanel()->track_event( 'Cancelled Membership', $event_props );
+		wp_mixpanel()->track_event( 'Lost Citizen', $event_props );
 
 	}
 }
