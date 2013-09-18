@@ -31,8 +31,6 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 	$person_props['subscription'] = $subscription;
 	$person_props['status']       = 'Active';
 
-	wp_mixpanel()->track_person( $user_id, $person_props );
-
 	switch( $posted['txn_type'] ) :
 
 		// New subscription
@@ -48,17 +46,10 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 
 			$person_props['recurring']    = 'Yes';
 
-			wp_mixpanel()->track_person( $user_id, $person_props );
-
 			break;
 
 		// Subscription payment
 		case 'subscr_payment' :
-
-			$trans_props = array(
-				'amount' => $payment_data['amount']
-			);
-			wp_mixpanel()->track_transaction( $user_id, $trans_props );
 
 			$event_props                 = array();
 			$event_props['distinct_id']  = $user_id;
@@ -82,13 +73,7 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 
 				wp_mixpanel()->track_event( 'Signup', $event_props );
 
-				$trans_props = array(
-					'amount' => $payment_data['amount']
-				);
-				wp_mixpanel()->track_transaction( $user_id, $trans_props );
-
 				$person_props['recurring'] = 'No';
-				wp_mixpanel()->track_person( $user_id, $person_props );
 
 			}
 
@@ -96,8 +81,59 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 
 	endswitch;
 
+	wp_mixpanel()->track_person( $user_id, $person_props );
+
 }
 add_action( 'rcp_valid_ipn', 'cgc_rcp_mixpanel_tracking', 10, 3 );
+
+function cgc_rcp_track_stripe_signup( $user_id, $data ) {
+
+	if( ! function_exists( 'wp_mixpanel' ) || ! function_exists( 'rcp_get_subscription_name' ) )
+		return;
+
+	wp_mixpanel()->set_api_key( CGC_MIXPANEL_API );
+
+	$user         = get_userdata( $user_id );
+	$subscription = rcp_get_subscription( $user_id );
+	$rcp_payments = new RCP_Payments;
+	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
+	$renewal      = ! empty( $new_user ) ? 'Yes' : 'No';
+
+	$person_props                 = array();
+	$person_props['first_name']   = $user->first_name;
+	$person_props['last_name']    = $user->last_name;
+	$person_props['user_login']   = $user->user_login;
+	$person_props['email']        = $user->user_email;
+	$person_props['subscription'] = $subscription;
+	$person_props['status']       = 'Active';
+	$person_props['recurring']    = isset( $data['auto_renew'] ) ? 'Yes' : 'No';
+	wp_mixpanel()->track_person( $user_id, $person_props );
+
+	$event_props                 = array();
+	$event_props['distinct_id']  = $user_id;
+	$event_props['subscription'] = $subscription;
+	$event_props['date']         = time();
+	$event_props['renewal']      = $renewal;
+
+	wp_mixpanel()->track_event( 'Signup', $event_props );
+
+}
+add_action( 'rcp_stripe_signup', 'cgc_rcp_track_stripe_signup', 10, 2 );
+
+function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
+
+	if( ! function_exists( 'wp_mixpanel' ) || ! function_exists( 'rcp_get_subscription_name' ) )
+		return;
+
+	wp_mixpanel()->set_api_key( CGC_MIXPANEL_API );
+
+	$trans_props = array(
+		'amount' => $amount
+	);
+	wp_mixpanel()->track_transaction( $args['user_id'], $trans_props );
+
+}
+add_action( 'rcp_insert_payment', 'cgc_rcp_track_payment', 10, 3 );
 
 
 function cgc_rcp_track_status_changes( $new_status, $user_id ) {
@@ -177,7 +213,6 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 	}
 }
 add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
-
 
 function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user_id, $status = 'logged_in' ) {
 
