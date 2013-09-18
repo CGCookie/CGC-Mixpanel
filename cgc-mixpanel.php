@@ -36,11 +36,16 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 		// New subscription
 		case 'subscr_signup' :
 
+			$user_time    = strtotime( $user->user_registered );
+			$ten_min_ago  = strtotime( '-10 Minutes' );
+			$upgrade      = $user_time < $ten_min_ago ? 'Yes' : 'No';
+
 			$event_props                 = array();
 			$event_props['distinct_id']  = $user_id;
 			$event_props['subscription'] = $subscription;
 			$event_props['date']         = time();
 			$event_props['renewal']      = $renewal;
+			$event_props['upgrade']      = $upgrade;
 
 			wp_mixpanel()->track_event( 'Signup', $event_props );
 
@@ -91,6 +96,10 @@ function cgc_rcp_track_stripe_signup( $user_id, $data ) {
 	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
 	$renewal      = ! empty( $new_user ) ? 'Yes' : 'No';
 
+	$user_time    = strtotime( $user->user_registered );
+	$ten_min_ago  = strtotime( '-10 Minutes' );
+	$upgrade      = $user_time < $ten_min_ago ? 'Yes' : 'No';
+
 	$person_props                 = array();
 	$person_props['first_name']   = $user->first_name;
 	$person_props['last_name']    = $user->last_name;
@@ -106,6 +115,7 @@ function cgc_rcp_track_stripe_signup( $user_id, $data ) {
 	$event_props['subscription'] = $subscription;
 	$event_props['date']         = time();
 	$event_props['renewal']      = $renewal;
+	$event_props['upgrade']      = $upgrade;
 
 	wp_mixpanel()->track_event( 'Signup', $event_props );
 
