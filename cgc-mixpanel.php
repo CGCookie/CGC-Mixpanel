@@ -7,11 +7,15 @@
  * Version: 1.0
  */
 
-
-
 function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 	if( ! function_exists( 'wp_mixpanel' ) || ! function_exists( 'rcp_get_subscription_name' ) )
 		return;
+
+	global $edd_options;
+
+	$token = isset( $edd_options['edd_mixpanel_api_key'] ) ? trim( $edd_options['edd_mixpanel_api_key'] ) : false;
+
+	wp_mixpanel()->set_api_key( $token );
 
 	$user         = get_userdata( $user_id );
 	$subscription = rcp_get_subscription( $user_id );
@@ -102,6 +106,12 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 	if( ! function_exists( 'wp_mixpanel' ) || ! function_exists( 'rcp_get_subscription_name' ) )
 		return;
 
+	global $edd_options;
+
+	$token = isset( $edd_options['edd_mixpanel_api_key'] ) ? trim( $edd_options['edd_mixpanel_api_key'] ) : false;
+
+	wp_mixpanel()->set_api_key( $token );
+
 	// We check for $_POST to make sure this only fires on the signup form
 	if( 'free' === $new_status && isset( $_POST['rcp_level'] ) ) {
 
@@ -177,6 +187,12 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 
 	if( ! class_exists( 'WP_Mixpanel' ) )
 		return;
+
+	global $edd_options;
+
+	$token = isset( $edd_options['edd_mixpanel_api_key'] ) ? trim( $edd_options['edd_mixpanel_api_key'] ) : false;
+
+	wp_mixpanel()->set_api_key( $token );
 
 	$user                         = get_userdata( $user_id );
 
