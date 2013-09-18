@@ -265,6 +265,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	}
 
 	wp_mixpanel()->track_event( 'Login', $event_props );
+	wp_mixpanel()->create_alias( $user_id, $user->user_email );
 
 }
 add_action( 'set_auth_cookie', 'cgc_mixpanel_user_login', 10, 5 );
