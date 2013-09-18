@@ -119,18 +119,6 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
 	wp_mixpanel()->set_api_key( CGC_MIXPANEL_API );
 
-	if( $args['payment_type'] == 'subscr_payment'] || $args['payment_type'] == 'Credit Card' ) {
-
-		$event_props                 = array();
-		$event_props['distinct_id']  = $args['user_id'];
-		$event_props['subscription'] = $args['subscription'];
-		$event_props['amount']       = $amount;
-		$event_props['date']         = time();
-
-		wp_mixpanel()->track_event( 'Subscription Payment', $event_props );
-
-	}
-
 	$trans_props = array(
 		'amount' => $amount
 	);
