@@ -205,6 +205,9 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$event_props['distinct_id']   = $user_id;
 	$event_props['sign_on_page']  = $_SERVER['HTTP_REFERER'];
 	$event_props['date']          = time();
+	if( function_exists( 'rcp_get_subscription' ) ) {
+		$event_props['subscription'] = rcp_get_subscription( $user_id );
+	}
 
 	wp_mixpanel()->track_event( 'Login', $event_props );
 
