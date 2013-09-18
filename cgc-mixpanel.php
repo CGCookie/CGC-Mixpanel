@@ -121,10 +121,12 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
 	if( $args['payment_type'] == 'Credit Card' || $args['payment_type'] == 'subscr_payment' ) {
 
+		$subscription = rcp_get_subscription( $args['user_id'] );
+
 		$event_props                 = array();
 		$event_props['distinct_id']  = $args['user_id'];
 		$event_props['subscription'] = $subscription;
-		$event_props['amount']       = $payment_data['amount'];
+		$event_props['amount']       = $amount;
 		$event_props['date']         = time();
 
 		wp_mixpanel()->track_event( 'Subscription Payment', $event_props );
