@@ -187,6 +187,10 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$person_props['user_login']   = $user->user_login;
 	$person_props['email']        = $user->user_email;
 
+	if( function_exists( 'rcp_get_subscription' ) ) {
+		$person_props['subscription'] = rcp_get_subscription( $user_id );
+	}
+
 	wp_mixpanel()->track_person( $user_id, $person_props );
 
 	$event_props                  = array();
