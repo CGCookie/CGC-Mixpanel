@@ -260,6 +260,8 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$event_props['date']          = time();
 	if( function_exists( 'rcp_get_subscription' ) ) {
 		$event_props['subscription'] = rcp_get_subscription( $user_id );
+		$event_props['status']       = rcp_get_status( $user_id );
+		$event_props['recurring']    = rcp_is_recurring( $user_id ) ? 'Yes' : 'No';
 	}
 
 	wp_mixpanel()->track_event( 'Login', $event_props );
