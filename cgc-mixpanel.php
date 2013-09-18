@@ -21,6 +21,7 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 	$subscription = rcp_get_subscription( $user_id );
 	$rcp_payments = new RCP_Payments;
 	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
+	$renewal      = ! empty( $new_user ) ? 'Yes' : 'No';
 
 	$person_props                 = array();
 	$person_props['first_name']   = $user->first_name;
@@ -37,17 +38,16 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 		// New subscription
 		case 'subscr_signup' :
 
-
 			$event_props                 = array();
 			$event_props['distinct_id']  = $user_id;
 			$event_props['subscription'] = $subscription;
 			$event_props['date']         = time();
+			$event_props['renewal']      = $renewal;
 
-			$type = ! empty( $new_user ) ? 'Citizen Renewal' : 'New Citizen Signup';
+			wp_mixpanel()->track_event( 'Signup', $event_props );
 
-			wp_mixpanel()->track_event( $type, $event_props );
+			$person_props['recurring']    = 'Yes';
 
-			$person_props['recurring'] = 'Yes';
 			wp_mixpanel()->track_person( $user_id, $person_props );
 
 			break;
@@ -78,10 +78,9 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 				$event_props['distinct_id']  = $user_id;
 				$event_props['subscription'] = $subscription;
 				$event_props['date']         = time();
+				$event_props['renewal']      = $renewal;
 
-				$type = ! empty( $new_user ) ? 'Citizen Renewal' : 'New Citizen Signup';
-
-				wp_mixpanel()->track_event( $type, $event_props );
+				wp_mixpanel()->track_event( 'Signup', $event_props );
 
 				$trans_props = array(
 					'amount' => $payment_data['amount']
@@ -127,8 +126,9 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$event_props['distinct_id']  = $user_id;
 		$event_props['subscription'] = rcp_get_subscription( $user_id );
 		$event_props['date']         = time();
+		$event_props['renewal']      = 'No';
 
-		wp_mixpanel()->track_event( 'Free Signup', $event_props );
+		wp_mixpanel()->track_event( 'Signup', $event_props );
 
 	} else if( 'expired' === $new_status ) {
 
