@@ -101,7 +101,7 @@ function cgc_rcp_track_stripe_signup( $user_id, $data ) {
 	$person_props['$last_name']    = $user->last_name;
 	$person_props['$email']        = $user->user_email;
 	$person_props['$username']     = $user->user_login;
-	$person_props['Subscription']  = $subscrloliption;
+	$person_props['Subscription']  = $subscription;
 	$person_props['Status']        = 'Active';
 	$person_props['Recurring']     = isset( $data['auto_renew'] ) ? 'Yes' : 'No';
 
