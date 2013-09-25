@@ -33,9 +33,9 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 	$person_props['$first_name']  = $user->first_name;
 	$person_props['$last_name']   = $user->last_name;
 	$person_props['$email']       = $user->user_email;
-	$person_props['user_login']   = $user->user_login;
-	$person_props['subscription'] = $subscription;
-	$person_props['status']       = 'Active';
+	$person_props['$username']    = $user->user_login;
+	$person_props['Subscription'] = $subscription;
+	$person_props['Status']       = 'Active';
 
 	switch( $posted['txn_type'] ) :
 
@@ -44,21 +44,25 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 
 			$user_time    = strtotime( $user->user_registered );
 			$ten_min_ago  = strtotime( '-10 Minutes' );
-			$upgrade      = $user_time < $ten_min_ago ? 'Yes' : 'No';
+			$upgrade      = $user_time < $ten_min_ago ? true : false;
 
-			$event_props                 = array();
-			$event_props['distinct_id']  = $user_id;
-			$event_props['subscription'] = $subscription;
-			$event_props['date']         = time();
-			$event_props['payment_method'] = 'Stripe';
+			$event_props                   = array();
+			$event_props['distinct_id']    = $user_id;
+			$event_props['Subscription']   = $subscription;
+			$event_props['$created']       = time();
+			$event_props['Payment Method'] = 'PayPal';
 			//$event_props['renewal']      = $renewal;
 			//$event_props['upgrade']      = $upgrade;
 
 			//wp_mixpanel()->track_event( 'Signup', $event_props );
 
-			$mp->track('Signup', $event_props );
+			if( $upgrade ) {
+				$mp->track( 'User Upgrade', $event_props );
+			} else {
+				$mp->track( 'User Signup', $event_props );
+			}
 
-			$person_props['recurring']    = 'Yes';
+			$person_props['Recurring'] = 'Yes';
 
 			break;
 
@@ -92,27 +96,28 @@ function cgc_rcp_track_stripe_signup( $user_id, $data ) {
 	$ten_min_ago  = strtotime( '-10 Minutes' );
 	$upgrade      = $user_time < $ten_min_ago ? 'Yes' : 'No';
 
-	$person_props                 = array();
+	$person_props                  = array();
 	$person_props['$first_name']   = $user->first_name;
 	$person_props['$last_name']    = $user->last_name;
 	$person_props['$email']        = $user->user_email;
-	$person_props['user_login']   = $user->user_login;
-	$person_props['subscription'] = $subscription;
-	$person_props['status']       = 'Active';
-	$person_props['recurring']    = isset( $data['auto_renew'] ) ? 'Yes' : 'No';
+	$person_props['$username']     = $user->user_login;
+	$person_props['Subscription']  = $subscrloliption;
+	$person_props['Status']        = 'Active';
+	$person_props['Recurring']     = isset( $data['auto_renew'] ) ? 'Yes' : 'No';
+
 	//wp_mixpanel()->track_person( $user_id, $person_props );
 	$mp->people->set( $user_id, $person_props );
 
-	$event_props                 = array();
-	$event_props['distinct_id']  = $user_id;
-	$event_props['subscription'] = $subscription;
-	$event_props['date']         = time();
-	$event_props['payment_method'] = 'Stripe';
+	$event_props                   = array();
+	$event_props['distinct_id']    = $user_id;
+	$event_props['Subscription']   = $subscription;
+	$event_props['Date']           = time();
+	$event_props['Payment Method'] = 'Stripe';
 	//$event_props['renewal']      = $renewal;
 	//$event_props['upgrade']      = $upgrade;
 
 	//wp_mixpanel()->track_event( 'Signup', $event_props );
-	$mp->track('Signup', $event_props );
+	$mp->track( 'Signup', $event_props );
 
 }
 add_action( 'rcp_stripe_signup', 'cgc_rcp_track_stripe_signup', 10, 2 );
@@ -134,9 +139,9 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $args['user_id'];
-		$event_props['subscription'] = $subscription;
-		$event_props['amount']       = $amount;
-		$event_props['date']         = time();
+		$event_props['Subscription'] = $subscription;
+		$event_props['Amount']       = $amount;
+		$event_props['Date']         = time();
 
 		//wp_mixpanel()->track_event( 'Subscription Payment', $event_props );
 		$mp->track( 'Subscription Payment', $event_props );
@@ -167,17 +172,17 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['$first_name']  = $user->first_name;
 		$person_props['$last_name']   = $user->last_name;
 		$person_props['$email']       = $user->user_email;
-		$person_props['user_login']   = $user->user_login;
-		$person_props['subscription'] = rcp_get_subscription( $user_id );
-		$person_props['status']       = 'free';
+		$person_props['$username']    = $user->user_login;
+		$person_props['Subscription'] = rcp_get_subscription( $user_id );
+		$person_props['Status']       = 'free';
 
 		$mp->people->set( $user_id, $person_props );
 		//wp_mixpanel()->track_person( $user_id, $person_props );
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
-		$event_props['subscription'] = rcp_get_subscription( $user_id );
-		$event_props['date']         = time();
+		$event_props['Subscription'] = rcp_get_subscription( $user_id );
+		$event_props['Date']         = time();
 		$event_props['renewal']      = 'No';
 
 		//wp_mixpanel()->track_event( 'Signup', $event_props );
@@ -191,19 +196,19 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['$first_name']  = $user->first_name;
 		$person_props['$last_name']   = $user->last_name;
 		$person_props['$email']       = $user->user_email;
-		$person_props['user_login']   = $user->user_login;
-		$person_props['subscription'] = rcp_get_subscription( $user_id );
-		$person_props['status']       = 'Expired';
-		$person_props['recurring']    = 'No';
+		$person_props['$username']    = $user->user_login;
+		$person_props['Subscription'] = rcp_get_subscription( $user_id );
+		$person_props['Status']       = 'Expired';
+		$person_props['Recurring']    = 'No';
 
 		//wp_mixpanel()->track_person( $user_id, $person_props );
 		$mp->people->set( $user_id, $person_props );
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
-		$event_props['subscription'] = rcp_get_subscription( $user_id );
+		$event_props['Subscription'] = rcp_get_subscription( $user_id );
 		$event_props['reason']       = 'Expired';
-		$event_props['date']         = time();
+		$event_props['Date']         = time();
 
 		//wp_mixpanel()->track_event( 'Lost Citizen', $event_props );
 		$mp->track( 'Lost Citizen', $event_props );
@@ -216,19 +221,19 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['$first_name']  = $user->first_name;
 		$person_props['$last_name']   = $user->last_name;
 		$person_props['$email']       = $user->user_email;
-		$person_props['user_login']   = $user->user_login;
-		$person_props['subscription'] = rcp_get_subscription( $user_id );
-		$person_props['status']       = 'Cancelled';
-		$person_props['recurring']    = 'No';
+		$person_props['$username']    = $user->user_login;
+		$person_props['Subscription'] = rcp_get_subscription( $user_id );
+		$person_props['Status']       = 'Cancelled';
+		$person_props['Recurring']    = 'No';
 
 		//wp_mixpanel()->track_person( $user_id, $person_props );
 		$mp->people->set( $user_id, $person_props );
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user_id;
-		$event_props['subscription'] = rcp_get_subscription( $user_id );
+		$event_props['Subscription'] = rcp_get_subscription( $user_id );
 		$event_props['reason']       = 'Cancelled';
-		$event_props['date']         = time();
+		$event_props['Date']         = time();
 
 		//wp_mixpanel()->track_event( 'Lost Citizen', $event_props );
 		$mp->track( 'Lost Citizen', $event_props );
@@ -253,11 +258,11 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$person_props['ip']           = cgc_mixpanel_get_ip();
 	$person_props['$first_name']  = $user->first_name;
 	$person_props['$last_name']   = $user->last_name;
-	$person_props['user_login']   = $user->user_login;
+	$person_props['$username']    = $user->user_login;
 	$person_props['$email']       = $user->user_email;
 
 	if( function_exists( 'rcp_get_subscription' ) ) {
-		$person_props['subscription'] = rcp_get_subscription( $user_id );
+		$person_props['Subscription'] = rcp_get_subscription( $user_id );
 	}
 
 	//wp_mixpanel()->track_person( $user_id, $person_props );
@@ -266,11 +271,11 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$event_props                  = array();
 	$event_props['distinct_id']   = $user_id;
 	$event_props['sign_on_page']  = $_SERVER['HTTP_REFERER'];
-	$event_props['date']          = time();
+	$event_props['Date']          = time();
 	if( function_exists( 'rcp_get_subscription' ) ) {
-		$event_props['subscription'] = rcp_get_subscription( $user_id );
-		$event_props['status']       = rcp_get_status( $user_id );
-		$event_props['recurring']    = rcp_is_recurring( $user_id ) ? 'Yes' : 'No';
+		$event_props['Subscription'] = rcp_get_subscription( $user_id );
+		$event_props['Status']       = rcp_get_status( $user_id );
+		$event_props['Recurring']    = rcp_is_recurring( $user_id ) ? 'Yes' : 'No';
 	}
 
 	//wp_mixpanel()->track_event( 'Login', $event_props );
