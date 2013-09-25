@@ -18,6 +18,9 @@ if( ! class_exists( 'Mixpanel' ) ) {
 // Track general signups
 function cgc_rcp_track_initial_signup( $post_data, $user_id, $price ) {
 
+	if( is_user_logged_in() )
+		return;
+
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
 	$user         = get_userdata( $user_id );
