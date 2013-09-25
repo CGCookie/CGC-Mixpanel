@@ -27,10 +27,12 @@ function cgc_rcp_mixpanel_tracking( $payment_data, $user_id, $posted ) {
 	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
 	$renewal      = ! empty( $new_user ) ? 'Yes' : 'No';
 
+	$mp->identify( $user_id );
+
 	$person_props                 = array();
-	$person_props['$first_name']   = $user->first_name;
-	$person_props['$last_name']    = $user->last_name;
-	$person_props['$email']        = $user->user_email;
+	$person_props['$first_name']  = $user->first_name;
+	$person_props['$last_name']   = $user->last_name;
+	$person_props['$email']       = $user->user_email;
 	$person_props['user_login']   = $user->user_login;
 	$person_props['subscription'] = $subscription;
 	$person_props['status']       = 'Active';
@@ -78,6 +80,8 @@ function cgc_rcp_track_stripe_signup( $user_id, $data ) {
 
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
+	$mp->identify( $user_id );
+
 	$user         = get_userdata( $user_id );
 	$subscription = rcp_get_subscription( $user_id );
 	$rcp_payments = new RCP_Payments;
@@ -122,6 +126,8 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
+	$mp->identify( $args['user_id'] );
+
 	if( $args['payment_type'] == 'Credit Card' || $args['payment_type'] == 'subscr_payment' ) {
 
 		$subscription = rcp_get_subscription( $args['user_id'] );
@@ -150,16 +156,18 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 	//wp_mixpanel()->set_api_key( CGC_MIXPANEL_API );
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
+	$mp->identify( $user_id );
+
 	// We check for $_POST to make sure this only fires on the signup form
 	if( 'free' === $new_status && isset( $_POST['rcp_level'] ) ) {
 
 		$user                         = get_userdata( $user_id );
 
 		$person_props                 = array();
-		$person_props['first_name']   = $user->first_name;
-		$person_props['last_name']    = $user->last_name;
+		$person_props['$first_name']  = $user->first_name;
+		$person_props['$last_name']   = $user->last_name;
+		$person_props['$email']       = $user->user_email;
 		$person_props['user_login']   = $user->user_login;
-		$person_props['email']        = $user->user_email;
 		$person_props['subscription'] = rcp_get_subscription( $user_id );
 		$person_props['status']       = 'free';
 
@@ -180,10 +188,10 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$user                         = get_userdata( $user_id );
 
 		$person_props                 = array();
-		$person_props['first_name']   = $user->first_name;
-		$person_props['last_name']    = $user->last_name;
+		$person_props['$first_name']  = $user->first_name;
+		$person_props['$last_name']   = $user->last_name;
+		$person_props['$email']       = $user->user_email;
 		$person_props['user_login']   = $user->user_login;
-		$person_props['email']        = $user->user_email;
 		$person_props['subscription'] = rcp_get_subscription( $user_id );
 		$person_props['status']       = 'Expired';
 		$person_props['recurring']    = 'No';
@@ -205,10 +213,10 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$user                         = get_userdata( $user_id );
 
 		$person_props                 = array();
-		$person_props['first_name']   = $user->first_name;
-		$person_props['last_name']    = $user->last_name;
+		$person_props['$first_name']  = $user->first_name;
+		$person_props['$last_name']   = $user->last_name;
+		$person_props['$email']       = $user->user_email;
 		$person_props['user_login']   = $user->user_login;
-		$person_props['email']        = $user->user_email;
 		$person_props['subscription'] = rcp_get_subscription( $user_id );
 		$person_props['status']       = 'Cancelled';
 		$person_props['recurring']    = 'No';
@@ -237,14 +245,16 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	//wp_mixpanel()->set_api_key( CGC_MIXPANEL_API );
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
+	$mp->identify( $user_id );
+
 	$user                         = get_userdata( $user_id );
 
 	$person_props                 = array();
 	$person_props['ip']           = cgc_mixpanel_get_ip();
-	$person_props['first_name']   = $user->first_name;
-	$person_props['last_name']    = $user->last_name;
+	$person_props['$first_name']  = $user->first_name;
+	$person_props['$last_name']   = $user->last_name;
 	$person_props['user_login']   = $user->user_login;
-	$person_props['email']        = $user->user_email;
+	$person_props['$email']       = $user->user_email;
 
 	if( function_exists( 'rcp_get_subscription' ) ) {
 		$person_props['subscription'] = rcp_get_subscription( $user_id );
