@@ -67,7 +67,7 @@ function cgc_rcp_track_initial_signup( $post_data, $user_id, $price ) {
 	$person_props['Status']        = $price > '0' ? 'Pending' : 'Free';
 
 	//wp_mixpanel()->track_person( $user_id, $person_props );
-	$mp->people->set( $user_id, $person_props );
+	$mp->people->set( $user->user_login, $person_props );
 
 	$event_props                   = array();
 	$event_props['distinct_id']    = $user->user_login;
@@ -93,7 +93,7 @@ function cgc_rcp_confirm_paid_paypal_signup( $payment_data, $user_id, $posted ) 
 	$renewal      = ! empty( $new_user );
 	$upgrade      = $user_time < $ten_min_ago && ! $renewal ? true : false;
 
-	$mp->identify( $user_id );
+	$mp->identify( $user->user_login );
 
 	$person_props                 = array();
 	$person_props['$first_name']  = $user->first_name;
@@ -126,7 +126,7 @@ function cgc_rcp_confirm_paid_paypal_signup( $payment_data, $user_id, $posted ) 
 
 	endswitch;
 
-	$mp->people->set( $user_id, $person_props );
+	$mp->people->set( $user->user_login, $person_props );
 
 }
 add_action( 'rcp_valid_ipn', 'cgc_rcp_confirm_paid_paypal_signup', 10, 3 );
@@ -141,9 +141,10 @@ function cgc_rcp_confirm_paid_stripe_signup( $user_id, $data ) {
 
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
-	$mp->identify( $user_id );
-
 	$user         = get_userdata( $user_id );
+
+	$mp->identify( $user->user_login );
+
 	$subscription = rcp_get_subscription( $user_id );
 	$rcp_payments = new RCP_Payments;
 	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
@@ -161,7 +162,7 @@ function cgc_rcp_confirm_paid_stripe_signup( $user_id, $data ) {
 	$person_props['Status']        = 'Active';
 	$person_props['Recurring']     = isset( $data['auto_renew'] ) ? 'Yes' : 'No';
 
-	$mp->people->set( $user_id, $person_props );
+	$mp->people->set( $user->user_login, $person_props );
 
 	$event_props                   = array();
 	$event_props['distinct_id']    = $user->user_login;
@@ -216,10 +217,12 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 	if( ! function_exists( 'rcp_get_subscription_name' ) )
 		return;
 
+	$user = get_userdata( $user_id );
+
 	//wp_mixpanel()->set_api_key( CGC_MIXPANEL_API );
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
-	$mp->identify( $user_id );
+	$mp->identify( $user->user_login );
 
 	/*
 	// We check for $_POST to make sure this only fires on the signup form
@@ -252,8 +255,6 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 	if( 'expired' === $new_status ) {
 
-		$user                         = get_userdata( $user_id );
-
 		$person_props                 = array();
 		$person_props['$first_name']  = $user->first_name;
 		$person_props['$last_name']   = $user->last_name;
@@ -264,7 +265,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['Recurring']    = 'No';
 
 		//wp_mixpanel()->track_person( $user_id, $person_props );
-		$mp->people->set( $user_id, $person_props );
+		$mp->people->set( $user->user_login, $person_props );
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user->user_login;
@@ -290,7 +291,7 @@ function cgc_rcp_track_cancelled_paypal( $user_id ) {
 	$person_props['Recurring']    = 'No';
 
 	//wp_mixpanel()->track_person( $user_id, $person_props );
-	$mp->people->set( $user_id, $person_props );
+	$mp->people->set( $user->user_login, $person_props );
 
 	$event_props                 = array();
 	$event_props['distinct_id']  = $user->user_login;
@@ -316,7 +317,7 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 	$person_props['Recurring']    = 'No';
 
 	//wp_mixpanel()->track_person( $user_id, $person_props );
-	$mp->people->set( $user_id, $person_props );
+	$mp->people->set( $user->user_login, $person_props );
 
 	$event_props                 = array();
 	$event_props['distinct_id']  = $user->user_login;
@@ -336,9 +337,9 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	//wp_mixpanel()->set_api_key( CGC_MIXPANEL_API );
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
-	$mp->identify( $user_id );
+	$user = get_userdata( $user_id );
 
-	$user                         = get_userdata( $user_id );
+	$mp->identify( $user->user_login );
 
 	$person_props                 = array();
 	$person_props['ip']           = cgc_mixpanel_get_ip();
@@ -352,7 +353,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	}
 
 	//wp_mixpanel()->track_person( $user_id, $person_props );
-	$mp->people->set( $user_id, $person_props );
+	$mp->people->set( $user->user_login, $person_props );
 
 	$event_props                  = array();
 	$event_props['distinct_id']   = $user->user_login;
