@@ -31,8 +31,10 @@ mixpanel.init("018006ab8a267cc6d0a158dbfe41801a");
 jQuery('#rcp_user_login').focusout(function() {
 	mixpanel.alias( jQuery(this).val() );
 });
+mixpanel.track( 'Page View: registration' );
 <?php elseif( is_page( 'registration' ) ) : ?>
 	mixpanel.identify( <?php echo get_current_user_id(); ?> );
+	mixpanel.track( 'Page View: registration' );
 <?php endif; ?>
 </script><!-- end Mixpanel -->
 <?php
