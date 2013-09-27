@@ -70,7 +70,7 @@ function cgc_rcp_track_initial_signup( $post_data, $user_id, $price ) {
 	$mp->people->set( $user_id, $person_props );
 
 	$event_props                   = array();
-	$event_props['distinct_id']    = $user_id;
+	$event_props['distinct_id']    = $user->user_login;
 	$event_props['Subscription']   = $subscription;
 
 	$mp->track( 'User Signup', $event_props );
@@ -109,7 +109,7 @@ function cgc_rcp_confirm_paid_paypal_signup( $payment_data, $user_id, $posted ) 
 		case 'subscr_signup' :
 
 			$event_props                   = array();
-			$event_props['distinct_id']    = $user_id;
+			$event_props['distinct_id']    = $user->user_login;
 			$event_props['Subscription']   = $subscription;
 			$event_props['$created']       = time();
 			$event_props['Payment Method'] = 'PayPal';
@@ -164,7 +164,7 @@ function cgc_rcp_confirm_paid_stripe_signup( $user_id, $data ) {
 	$mp->people->set( $user_id, $person_props );
 
 	$event_props                   = array();
-	$event_props['distinct_id']    = $user_id;
+	$event_props['distinct_id']    = $user->user_login;
 	$event_props['Subscription']   = $subscription;
 	$event_props['Date']           = time();
 	$event_props['Payment Method'] = 'Stripe';
@@ -187,14 +187,16 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
-	$mp->identify( $args['user_id'] );
+	$user = get_userdata( $args['user_id'] );
+
+	$mp->identify( $user->user_login );
 
 	if( $args['payment_type'] == 'Credit Card' || $args['payment_type'] == 'subscr_payment' ) {
 
 		$subscription = rcp_get_subscription( $args['user_id'] );
 
 		$event_props                 = array();
-		$event_props['distinct_id']  = $args['user_id'];
+		$event_props['distinct_id']  = $user->user_login;
 		$event_props['Subscription'] = $subscription;
 		$event_props['Amount']       = $amount;
 		$event_props['Date']         = time();
@@ -204,7 +206,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
 	}
 
-	$mp->people->trackCharge( $args['user_id'], $amount );
+	$mp->people->trackCharge( $user->user_login, $amount );
 }
 add_action( 'rcp_insert_payment', 'cgc_rcp_track_payment', 10, 3 );
 
@@ -265,7 +267,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$mp->people->set( $user_id, $person_props );
 
 		$event_props                 = array();
-		$event_props['distinct_id']  = $user_id;
+		$event_props['distinct_id']  = $user->user_login;
 		$event_props['Subscription'] = rcp_get_subscription( $user_id );
 		$event_props['Reason']       = 'Expired';
 		$event_props['Date']         = time();
@@ -291,7 +293,7 @@ function cgc_rcp_track_cancelled_paypal( $user_id ) {
 	$mp->people->set( $user_id, $person_props );
 
 	$event_props                 = array();
-	$event_props['distinct_id']  = $user_id;
+	$event_props['distinct_id']  = $user->user_login;
 	$event_props['Subscription'] = rcp_get_subscription( $user_id );
 	$event_props['Reason']       = 'Cancelled';
 	$event_props['Date']         = time();
@@ -317,7 +319,7 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 	$mp->people->set( $user_id, $person_props );
 
 	$event_props                 = array();
-	$event_props['distinct_id']  = $user_id;
+	$event_props['distinct_id']  = $user->user_login;
 	$event_props['Subscription'] = rcp_get_subscription( $user_id );
 	$event_props['Reason']       = 'Cancelled';
 	$event_props['Date']         = time();
@@ -353,7 +355,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$mp->people->set( $user_id, $person_props );
 
 	$event_props                  = array();
-	$event_props['distinct_id']   = $user_id;
+	$event_props['distinct_id']   = $user->user_login;
 	$event_props['sign_on_page']  = $_SERVER['HTTP_REFERER'];
 	$event_props['Date']          = time();
 	if( function_exists( 'rcp_get_subscription' ) ) {
