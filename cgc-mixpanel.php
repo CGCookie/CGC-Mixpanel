@@ -27,7 +27,7 @@ mixpanel.init("018006ab8a267cc6d0a158dbfe41801a");
 	mixpanel.track( 'Page View: membership' );
 <?php endif; ?>
 <?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
-jQuery('#rcp_user_login').focusout(function() {
+jQuery('body').on('focusout', '#rcp_user_login', function( event ) {
 	mixpanel.alias( jQuery(this).val() );
 });
 mixpanel.track( 'Page View: registration' );
