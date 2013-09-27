@@ -31,7 +31,6 @@ mixpanel.track( 'Page View: registration' );
 jQuery(document).ready(function() {
 	jQuery('#rcp_registration_form').submit(function( event ) {
 		mixpanel.alias( jQuery('#rcp_user_login').val() );
-		mixpanel.identify( '<?php echo $user_data->user_login; ?>' );
 	});
 });
 <?php elseif( is_page( 'registration' ) ) : $user_data = get_userdata( get_current_user_id() ); ?>
