@@ -26,7 +26,6 @@ mixpanel.init("018006ab8a267cc6d0a158dbfe41801a");
 	// Send event for landing on membership
 	mixpanel.track( 'Page View: membership' );
 <?php endif; ?>
-</script><!-- end Mixpanel -->
 <?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
 jQuery('#rcp_user_login').focusout(function() {
 	mixpanel.alias( jQuery(this).val() );
