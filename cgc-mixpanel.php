@@ -31,8 +31,8 @@ jQuery('#rcp_user_login').focusout(function() {
 	mixpanel.alias( jQuery(this).val() );
 });
 mixpanel.track( 'Page View: registration' );
-<?php elseif( is_page( 'registration' ) ) : ?>
-	mixpanel.identify( <?php echo get_current_user_id(); ?> );
+<?php elseif( is_page( 'registration' ) ) : $user_data = get_userdata( get_current_user_id() ); ?>
+	mixpanel.identify( <?php echo $user_data->user_login; ?> );
 	mixpanel.track( 'Page View: registration' );
 <?php endif; ?>
 </script><!-- end Mixpanel -->
