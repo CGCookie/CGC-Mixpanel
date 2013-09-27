@@ -23,8 +23,16 @@ typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var
 b._i.push([a,e,d])};b.__SV=1.2}})(document,window.mixpanel||[]);
 mixpanel.init("018006ab8a267cc6d0a158dbfe41801a");
 <?php if( is_page( 'membership' ) ) : ?>
-// Send event for landing on membership
-mixpanel.track( 'Page View: membership' );
+	// Send event for landing on membership
+	mixpanel.track( 'Page View: membership' );
+<?php endif; ?>
+</script><!-- end Mixpanel -->
+<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
+jQuery('#rcp_user_login').focusout(function() {
+	mixpanel.alias( jQuery(this).val() );
+});
+<?php elseif( is_page( 'registration' ) ) : ?>
+	mixpanel.identify( <?php echo get_current_user_id(); ?> );
 <?php endif; ?>
 </script><!-- end Mixpanel -->
 <?php
