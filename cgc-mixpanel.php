@@ -60,7 +60,6 @@ function cgc_rcp_track_initial_signup( $post_data, $user_id, $price ) {
 	$renewal      = ! empty( $new_user );
 	$upgrade      = $user_time < $ten_min_ago && ! $renewal ? true : false;
 
-	$mp->identify( $user->user_login );
 
 	$person_props                  = array();
 	$person_props['$first_name']   = $user->first_name;
@@ -77,6 +76,7 @@ function cgc_rcp_track_initial_signup( $post_data, $user_id, $price ) {
 	$event_props['distinct_id']    = $user->user_login;
 	$event_props['Subscription']   = $subscription;
 
+	$mp->identify( $user->user_login );
 	$mp->track( 'User Signup', $event_props );
 }
 add_action( 'rcp_form_processing', 'cgc_rcp_track_initial_signup', 10, 3 );
