@@ -30,11 +30,11 @@ mixpanel.init("018006ab8a267cc6d0a158dbfe41801a");
 jQuery(document).ready(function($) {
 	jQuery('#rcp_registration_form').submit(function( event ) {
 		event.preventDefault();
-		var $this = $(this);
+		var $form = $(this);
 		mixpanel.track( 'Page View: registration', {}, function() {
 			mixpanel.alias( jQuery('#rcp_user_login').val() );
 			setTimeout(function(){
-				$this.submit();
+				$form.get(0).submit();
 			}, 2000);
 		});
 	} );
