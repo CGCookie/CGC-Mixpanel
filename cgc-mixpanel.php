@@ -212,6 +212,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 		$event_props['Subscription'] = $subscription;
 		$event_props['Amount']       = $amount;
 		$event_props['Date']         = time();
+		$event_props['Payment Method']= $args['payment_type'];
 
 		//wp_mixpanel()->track_event( 'Subscription Payment', $event_props );
 		$mp->track( 'Subscription Payment', $event_props );
