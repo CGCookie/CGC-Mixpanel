@@ -27,12 +27,17 @@ mixpanel.init("018006ab8a267cc6d0a158dbfe41801a");
 	mixpanel.track( 'Page View: membership' );
 <?php endif; ?>
 <?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
-mixpanel.track( 'Page View: registration' );
-jQuery(document).ready(function() {
-	jQuery('#rcp_registration_form').submit(function( event ) {
+jQuery('#rcp_registration_form').submit(function( event ) {
+	e.preventDefault();
+	var $this = $(this);
+	mixpanel.track( 'Page View: registration', {}, function() {
 		mixpanel.alias( jQuery('#rcp_user_login').val() );
+		setTimeout(function(){
+			$this.submit();
+		}, 2000);
 	});
-});
+} );
+
 <?php elseif( is_page( 'registration' ) ) : $user_data = get_userdata( get_current_user_id() ); ?>
 	mixpanel.identify( '<?php echo $user_data->user_login; ?>' );
 	mixpanel.track( 'Page View: registration' );
