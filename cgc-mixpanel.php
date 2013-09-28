@@ -27,7 +27,7 @@ mixpanel.init("018006ab8a267cc6d0a158dbfe41801a");
 	mixpanel.track( 'Page View: membership' );
 <?php endif; ?>
 <?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
-jQuery(document).ready(function() {
+jQuery(document).ready(function($) {
 	jQuery('#rcp_registration_form').submit(function( event ) {
 		event.preventDefault();
 		var $this = $(this);
