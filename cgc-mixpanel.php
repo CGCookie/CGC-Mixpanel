@@ -399,6 +399,51 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 add_action( 'set_auth_cookie', 'cgc_mixpanel_user_login', 10, 5 );
 
 
+function cgc_mixpanel_invalid_captcha() {
+	global $user_ID;
+	$codes = rcp_errors()->get_error_codes();
+	if( $codes ) {
+		foreach( $codes as $code ) {
+			if( $code == 'invalid_recaptcha' ) {
+				$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+				if( is_user_logged_in() ) {
+
+					$user = get_userdata( $user_ID );
+
+					$mp->identify( $user->user_login );
+
+					$person_props                 = array();
+					$person_props['$first_name']  = $user->first_name;
+					$person_props['$last_name']   = $user->last_name;
+					$person_props['$username']    = $user->user_login;
+					$person_props['$email']       = $user->user_email;
+
+					if( function_exists( 'rcp_get_subscription' ) ) {
+						$person_props['Subscription'] = rcp_get_subscription( $user_ID );
+					}
+
+					$mp->people->set( $user->user_login, $person_props );
+
+				}
+
+				$event_props = array();
+				if( is_user_logged_in() ) {
+					$event_props['distinct_id']  = $user->user_login;
+					$event_props['Subscription'] = rcp_get_subscription( $user_ID );
+				} else {
+					$event_props['Subscription']       = rcp_get_subscription_name( $_POST['rcp_level'] );
+					$event_props['Requested Username'] = $_POST['rcp_user_login'];
+				}
+
+				$mp->track( 'Form Submit: reCaptcha Fail', $event_props );
+			}
+		}
+	}
+}
+add_action( 'rcp_form_errors', 'cgc_mixpanel_invalid_captcha', 999 );
+
+
 /**
  * Get User IP
  *
