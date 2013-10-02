@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
 	jQuery('#rcp_registration_form').submit(function( event ) {
 		event.preventDefault();
 		var $form = $(this);
-		var subscription = $form.find('label.radio.checked .rcp_subscription_level_name').val();
+		var subscription = $form.find('.radio input:checked').next().val();
 		mixpanel.track( 'Form Submit: Registration', { 'Subscription' : subscription }, function() {
 			mixpanel.alias( jQuery('#rcp_user_login').val() );
 			setTimeout(function(){
