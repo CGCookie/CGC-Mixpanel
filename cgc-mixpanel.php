@@ -79,7 +79,7 @@ function cgc_rcp_track_initial_signup( $post_data, $user_id, $price ) {
 	$person_props['$username']     = $user->user_login;
 	$person_props['Subscription']  = $subscription;
 	$person_props['Status']        = $price > '0' ? 'Pending' : 'Free';
-	$person_props['ip']            = cgc_mixpanel_get_ip();
+	$person_props['$ip']            = cgc_mixpanel_get_ip();
 	//wp_mixpanel()->track_person( $user_id, $person_props );
 	$mp->people->set( $user->user_login, $person_props );
 
@@ -117,7 +117,7 @@ function cgc_rcp_confirm_paid_paypal_signup( $payment_data, $user_id, $posted ) 
 	$person_props['$username']    = $user->user_login;
 	$person_props['Subscription'] = $subscription;
 	$person_props['Status']       = 'Active';
-	$person_props['ip']           = cgc_mixpanel_get_ip();
+	$person_props['$ip']           = cgc_mixpanel_get_ip();
 	switch( $posted['txn_type'] ) :
 
 		// New subscription
@@ -176,7 +176,7 @@ function cgc_rcp_confirm_paid_stripe_signup( $user_id, $data ) {
 	$person_props['Subscription']  = $subscription;
 	$person_props['Status']        = 'Active';
 	$person_props['Recurring']     = isset( $data['auto_renew'] ) ? 'Yes' : 'No';
-	$person_props['ip']            = cgc_mixpanel_get_ip();
+	$person_props['$ip']            = cgc_mixpanel_get_ip();
 
 	$mp->people->set( $user->user_login, $person_props );
 
@@ -220,7 +220,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 		$person_props['Subscription']  = $subscription;
 		$person_props['Status']        = 'Active';
 		$person_props['Recurring']     = rcp_is_recurring( $args['user_id'] ) ? 'Yes' : 'No';
-		$person_props['ip']            = cgc_mixpanel_get_ip();
+		$person_props['$ip']            = cgc_mixpanel_get_ip();
 
 		$mp->people->set( $user->user_login, $person_props );
 
@@ -293,7 +293,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['Subscription'] = rcp_get_subscription( $user_id );
 		$person_props['Status']       = 'Expired';
 		$person_props['Recurring']    = 'No';
-		$person_props['ip']           = cgc_mixpanel_get_ip();
+		$person_props['$ip']           = cgc_mixpanel_get_ip();
 
 		//wp_mixpanel()->track_person( $user_id, $person_props );
 		$mp->people->set( $user->user_login, $person_props );
@@ -320,7 +320,7 @@ function cgc_rcp_track_cancelled_paypal( $user_id ) {
 	$person_props['Subscription'] = rcp_get_subscription( $user_id );
 	$person_props['Status']       = 'Cancelled';
 	$person_props['Recurring']    = 'No';
-	$person_props['ip']           = cgc_mixpanel_get_ip();
+	$person_props['$ip']           = cgc_mixpanel_get_ip();
 
 	//wp_mixpanel()->track_person( $user_id, $person_props );
 	$mp->people->set( $user->user_login, $person_props );
@@ -344,7 +344,7 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 	$person_props['$last_name']   = $user->last_name;
 	$person_props['$email']       = $user->user_email;
 	$person_props['$username']    = $user->user_login;
-	$person_props['ip']           = cgc_mixpanel_get_ip();
+	$person_props['$ip']           = cgc_mixpanel_get_ip();
 	$person_props['Subscription'] = rcp_get_subscription( $user_id );
 	$person_props['Status']       = 'Cancelled';
 	$person_props['Recurring']    = 'No';
@@ -424,7 +424,7 @@ function cgc_mixpanel_invalid_captcha() {
 					$person_props['$last_name']   = $user->last_name;
 					$person_props['$username']    = $user->user_login;
 					$person_props['$email']       = $user->user_email;
-					$person_props['ip']           = cgc_mixpanel_get_ip();
+					$person_props['$ip']           = cgc_mixpanel_get_ip();
 
 					if( function_exists( 'rcp_get_subscription' ) ) {
 						$person_props['Subscription'] = rcp_get_subscription( $user_ID );
