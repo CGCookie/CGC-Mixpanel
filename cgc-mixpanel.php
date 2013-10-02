@@ -27,7 +27,7 @@ mixpanel.init("018006ab8a267cc6d0a158dbfe41801a");
 	mixpanel.track( 'Page View: membership' );
 <?php elseif( is_page( 'shop' ) ) : ?>
 	mixpanel.track( 'Page View: Shop' );
-<?php elseif( is_singular( 'shop' ) ) : ?>
+<?php elseif( is_singular( 'download' ) ) : ?>
 	mixpanel.track( 'Page View: Shop Product', { 'product': '<?php the_title_attribute(); ?>' } );
 <?php endif; ?>
 <?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
