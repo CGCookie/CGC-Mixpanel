@@ -379,7 +379,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$person_props['$last_name']   = $user->last_name;
 	$person_props['$username']    = $user->user_login;
 	$person_props['$email']       = $user->user_email;
-	$person_props['ip']           = cgc_mixpanel_get_ip();
+	$person_props['$ip']           = cgc_mixpanel_get_ip();
 
 	if( function_exists( 'rcp_get_subscription' ) ) {
 		$person_props['Subscription'] = rcp_get_subscription( $user_id );
