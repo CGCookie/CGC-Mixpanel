@@ -366,7 +366,6 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$mp->identify( $user->user_login );
 
 	$person_props                 = array();
-	$person_props['ip']           = cgc_mixpanel_get_ip();
 	$person_props['$first_name']  = $user->first_name;
 	$person_props['$last_name']   = $user->last_name;
 	$person_props['$username']    = $user->user_login;
