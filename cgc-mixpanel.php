@@ -207,6 +207,18 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
 		$subscription = rcp_get_subscription( $args['user_id'] );
 
+		$person_props                  = array();
+		$person_props['$first_name']   = $user->first_name;
+		$person_props['$last_name']    = $user->last_name;
+		$person_props['$email']        = $user->user_email;
+		$person_props['$username']     = $user->user_login;
+		$person_props['Subscription']  = $subscription;
+		$person_props['Status']        = 'Active';
+		$person_props['Recurring']     = rcp_is_recurring( $args['user_id'] ) ? 'Yes' : 'No';
+
+		$mp->people->set( $user->user_login, $person_props );
+
+
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user->user_login;
 		$event_props['Subscription'] = $subscription;
