@@ -489,6 +489,9 @@ add_action( 'edd_post_add_to_cart', 'cgc_edd_track_added_to_cart' );
 // Track customers landing on the checkout page
 function cgc_edd_track_checkout_loaded() {
 
+	if( ! function_exists( 'edd_is_checkout' ) )
+		return;
+
 	// Only track the checkout page when the cart is not empty
 	if( ! edd_is_checkout() || ! edd_get_cart_contents() )
 		return;
