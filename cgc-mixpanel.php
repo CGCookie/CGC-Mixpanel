@@ -452,6 +452,135 @@ function cgc_mixpanel_invalid_captcha() {
 add_action( 'rcp_form_errors', 'cgc_mixpanel_invalid_captcha', 999 );
 
 
+
+// Track when customers add items to the cart
+function cgc_edd_track_added_to_cart( $download_id = 0, $options = array() ) {
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	if( is_user_logged_in() ) {
+
+		$user = get_userdata( get_current_user_id() );
+
+		$person_props       = array();
+		$person_props['ip'] = edd_get_ip();
+		$mp->people->set( $user->user_login, $person_props );
+
+		$mp->identify( $user->user_login );
+	}
+
+	$event_props = array();
+
+	if( is_user_logged_in() )
+		$event_props['distinct_id'] = $user->user_login;
+
+	$event_props['$ip']           = edd_get_ip();
+	$event_props['session_id']   = EDD()->session->get_id();
+	$event_props['product_name'] = get_the_title( $download_id );
+	$event_props['product_price']= edd_get_cart_item_price( $download_id, $options );
+	if( function_exists( 'rcp_get_subscription' ) && is_user_logged_in() ) {
+		$event_props['subscription'] = rcp_get_subscription( get_current_user_id() );
+	}
+
+	$mp->track( 'EDD Added to Cart', $event_props );
+}
+add_action( 'edd_post_add_to_cart', 'cgc_edd_track_added_to_cart' );
+
+// Track customers landing on the checkout page
+function cgc_edd_track_checkout_loaded() {
+
+	// Only track the checkout page when the cart is not empty
+	if( ! edd_is_checkout() || ! edd_get_cart_contents() )
+		return;
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	if( is_user_logged_in() ) {
+
+		$user = get_userdata( get_current_user_id() );
+
+		$person_props       = array();
+		$person_props['ip'] = edd_get_ip();
+
+		$mp->people->set( $user->user_login, $person_props );
+	}
+
+	$event_props = array();
+
+	if( is_user_logged_in() )
+		$event_props['distinct_id'] = $user->user_login;
+
+	$event_props['$ip']         = edd_get_ip();
+	$event_props['session_id'] = EDD()->session->get_id();
+
+	$products = array();
+	foreach( edd_get_cart_contents() as $download ) {
+		$products[] = get_the_title( $download['id'] );
+	}
+	$event_props['products']   = implode( ', ', $products );
+	$event_props['cart_count'] = edd_get_cart_quantity();
+	$event_props['cart_sum']   = edd_get_cart_subtotal();
+	if( function_exists( 'rcp_get_subscription' ) && is_user_logged_in() ) {
+		$event_props['subscription'] = rcp_get_subscription( get_current_user_id() );
+	}
+
+	$mp->track( 'EDD Checkout Loaded', $event_props );
+
+}
+add_action( 'template_redirect', 'cgc_edd_track_checkout_loaded' );
+
+// Track completed purchases
+function cgc_edd_track_purchase( $payment_id, $new_status, $old_status ) {
+
+	if ( $old_status == 'publish' || $old_status == 'complete' )
+		return; // Make sure that payments are only completed once
+
+	// Make sure the payment completion is only processed when new status is complete
+	if ( $new_status != 'publish' && $new_status != 'complete' )
+		return;
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user_info = edd_get_payment_meta_user_info( $payment_id );
+	$user_id   = edd_get_payment_user_id( $payment_id );
+	$downloads = edd_get_payment_meta_cart_details( $payment_id );
+	$amount    = edd_get_payment_amount( $payment_id );
+
+	if( $user_id <= 0 ) {
+		$distinct = $user_info['email'];
+	} else {
+		$user = get_userdata( $user_id );
+		$distinct = $user->user_login;
+	}
+
+	$person_props                  = array();
+	$person_props['$first_name']   = $user_info['first_name'];
+	$person_props['$last_name']    = $user_info['last_name'];
+	$person_props['$email']        = $user_info['email'];
+	$person_props['$ip']            = edd_get_ip();
+
+	$mp->people->set( $distinct, $person_props );
+
+	$event_props                  = array();
+	$event_props['distinct_id']   = $distinct;
+	$event_props['amount']        = $amount;
+	$event_props['session_id']    = EDD()->session->get_id();
+	$event_props['purchase_date'] = strtotime( get_post_field( 'post_date', $payment_id ) );
+	$event_props['cart_count']    = edd_get_cart_quantity();
+
+	$products = array();
+	foreach( $downloads as $download ) {
+		$products[] = get_the_title( $download['id'] );
+	}
+	$event_props['products'] = implode( ', ', $products );
+
+	$mp->track( 'EDD Sale', $event_props );
+
+	$mp->people->trackCharge( $distinct, $amount );
+}
+add_action( 'edd_update_payment_status', 'cgc_edd_track_purchase', 100, 3 );
+
+
 /**
  * Get User IP
  *
