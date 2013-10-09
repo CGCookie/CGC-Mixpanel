@@ -26,8 +26,14 @@ mixpanel.init("018006ab8a267cc6d0a158dbfe41801a");
 	// Send event for landing on membership
 	mixpanel.track( 'Page View: membership' );
 <?php elseif( is_page( 'shop' ) ) : ?>
+	<?php if( is_user_logged_in() ) : $user_data = get_userdata( get_current_user_id() );?>
+	mixpanel.identify( '<?php echo $user_data->user_login; ?>' );
+	<?php endif; ?>
 	mixpanel.track( 'Page View: Shop' );
 <?php elseif( is_singular( 'download' ) ) : ?>
+	<?php if( is_user_logged_in() ) : $user_data = get_userdata( get_current_user_id() );?>
+	mixpanel.identify( '<?php echo $user_data->user_login; ?>' );
+	<?php endif; ?>
 	mixpanel.track( 'Page View: Shop Product', { 'product': '<?php the_title_attribute(); ?>' } );
 <?php endif; ?>
 <?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
