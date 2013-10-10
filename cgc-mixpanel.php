@@ -375,7 +375,8 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$person_props['$last_name']   = $user->last_name;
 	$person_props['$username']    = $user->user_login;
 	$person_props['$email']       = $user->user_email;
-	$person_props['$ip']           = cgc_mixpanel_get_ip();
+	$person_props['$ip']          = cgc_mixpanel_get_ip();
+	$person_props['ip']           = cgc_mixpanel_get_ip();
 
 	if( function_exists( 'rcp_get_subscription' ) ) {
 		$person_props['Subscription'] = rcp_get_subscription( $user_id );
@@ -388,6 +389,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$event_props['distinct_id']   = $user->user_login;
 	$event_props['sign_on_page']  = $_SERVER['HTTP_REFERER'];
 	$event_props['Date']          = time();
+	$event_props['$ip']           = cgc_mixpanel_get_ip();
 	if( function_exists( 'rcp_get_subscription' ) ) {
 		$event_props['Subscription'] = rcp_get_subscription( $user_id );
 		$event_props['Status']       = rcp_get_status( $user_id );
