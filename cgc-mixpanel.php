@@ -376,7 +376,6 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$person_props['$username']    = $user->user_login;
 	$person_props['$email']       = $user->user_email;
 	$person_props['$ip']          = cgc_mixpanel_get_ip();
-	$person_props['ip']           = cgc_mixpanel_get_ip();
 
 	if( function_exists( 'rcp_get_subscription' ) ) {
 		$person_props['Subscription'] = rcp_get_subscription( $user_id );
@@ -460,7 +459,7 @@ function cgc_edd_track_added_to_cart( $download_id = 0, $options = array() ) {
 		$user = get_userdata( get_current_user_id() );
 
 		$person_props       = array();
-		$person_props['ip'] = edd_get_ip();
+		$person_props['$ip']= edd_get_ip();
 		$mp->people->set( $user->user_login, $person_props );
 
 		$mp->identify( $user->user_login );
@@ -471,7 +470,7 @@ function cgc_edd_track_added_to_cart( $download_id = 0, $options = array() ) {
 	if( is_user_logged_in() )
 		$event_props['distinct_id'] = $user->user_login;
 
-	$event_props['$ip']           = edd_get_ip();
+	$event_props['$ip']          = edd_get_ip();
 	$event_props['session_id']   = EDD()->session->get_id();
 	$event_props['product_name'] = get_the_title( $download_id );
 	$event_props['product_price']= edd_get_cart_item_price( $download_id, $options );
@@ -500,7 +499,7 @@ function cgc_edd_track_checkout_loaded() {
 		$user = get_userdata( get_current_user_id() );
 
 		$person_props       = array();
-		$person_props['ip'] = edd_get_ip();
+		$person_props['$ip'] = edd_get_ip();
 
 		$mp->people->set( $user->user_login, $person_props );
 	}
