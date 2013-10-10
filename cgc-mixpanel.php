@@ -213,33 +213,28 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
 	$mp->identify( $user->user_login );
 
-	if( $args['payment_type'] == 'Credit Card' || $args['payment_type'] == 'subscr_payment' ) {
+	$subscription = rcp_get_subscription( $args['user_id'] );
 
-		$subscription = rcp_get_subscription( $args['user_id'] );
+	$person_props                  = array();
+	$person_props['$first_name']   = $user->first_name;
+	$person_props['$last_name']    = $user->last_name;
+	$person_props['$email']        = $user->user_email;
+	$person_props['$username']     = $user->user_login;
+	$person_props['Subscription']  = $subscription;
+	$person_props['Status']        = ucwords( rcp_get_status( $user->ID ) );
+	$person_props['Recurring']     = rcp_is_recurring( $args['user_id'] ) ? 'Yes' : 'No';
 
-		$person_props                  = array();
-		$person_props['$first_name']   = $user->first_name;
-		$person_props['$last_name']    = $user->last_name;
-		$person_props['$email']        = $user->user_email;
-		$person_props['$username']     = $user->user_login;
-		$person_props['Subscription']  = $subscription;
-		$person_props['Status']        = 'Active';
-		$person_props['Recurring']     = rcp_is_recurring( $args['user_id'] ) ? 'Yes' : 'No';
-
-		$mp->people->set( $user->user_login, $person_props );
+	$mp->people->set( $user->user_login, $person_props );
 
 
-		$event_props                 = array();
-		$event_props['distinct_id']  = $user->user_login;
-		$event_props['Subscription'] = $subscription;
-		$event_props['Amount']       = $amount;
-		$event_props['Date']         = time();
-		$event_props['Payment Method']= $args['payment_type'];
+	$event_props                 = array();
+	$event_props['distinct_id']  = $user->user_login;
+	$event_props['Subscription'] = $subscription;
+	$event_props['Amount']       = $amount;
+	$event_props['Date']         = time();
+	$event_props['Payment Method']= $args['payment_type'];
 
-		//wp_mixpanel()->track_event( 'Subscription Payment', $event_props );
-		$mp->track( 'Subscription Payment', $event_props );
-
-	}
+	$mp->track( 'Subscription Payment', $event_props );
 
 	$mp->people->trackCharge( $user->user_login, $amount );
 }
