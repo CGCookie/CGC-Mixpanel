@@ -86,7 +86,7 @@ function cgc_rcp_track_initial_signup( $post_data, $user_id, $price ) {
 	$person_props['$username']     = $user->user_login;
 	$person_props['Subscription']  = $subscription;
 	$person_props['Status']        = $price > '0' ? 'Pending' : 'Free';
-	$person_props['$ip']            = cgc_mixpanel_get_ip();
+	$person_props['$ip']           = cgc_mixpanel_get_ip();
 	//wp_mixpanel()->track_person( $user_id, $person_props );
 	$mp->people->set( $user->user_login, $person_props );
 
