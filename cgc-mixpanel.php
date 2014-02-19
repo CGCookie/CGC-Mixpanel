@@ -17,7 +17,41 @@ if( ! class_exists( 'Mixpanel' ) ) {
 	require dirname( __FILE__ ) . '/mixpanel/lib/Mixpanel.php';
 }
 
+function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user_id, $status = 'logged_in' ) {
 
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user = get_userdata( $user_id );
+
+	$mp->identify( $user->user_login );
+
+	$person_props                 = array();
+	$person_props['$first_name']  = $user->first_name;
+	$person_props['$last_name']   = $user->last_name;
+	$person_props['$username']    = $user->user_login;
+	$person_props['$email']       = $user->user_email;
+	$person_props['$ip']          = cgc_mixpanel_get_ip();
+
+	if( function_exists( 'rcp_get_subscription' ) ) {
+		$person_props['Account Type'] = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
+		$person_props['Payment Term'] = rcp_get_subscription( $user_id );
+	}
+
+	$mp->people->set( $user->user_login, $person_props );
+
+	$event_props                  = array();
+	$event_props['distinct_id']   = $user->user_login;
+	$event_props['$ip']           = cgc_mixpanel_get_ip();
+	$event_props['Date']          = time();
+	if( function_exists( 'rcp_get_subscription' ) ) {
+		$event_props['Account Type'] = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
+		$event_props['Payment Term'] = rcp_get_subscription( $user_id );
+	}
+
+	$mp->track( 'Login', $event_props );
+
+}
+add_action( 'set_auth_cookie', 'cgc_mixpanel_user_login', 10, 5 );
 
 /*
 function cgc_mixpanel_javascript() {
@@ -333,49 +367,6 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 	$mp->track( 'Lost Citizen', $event_props );
 }
 add_action( 'rcp_strip_customer.subscription.deleted', 'cgc_rcp_track_cancelled_stripe' );
-
-function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user_id, $status = 'logged_in' ) {
-
-	//if( ! class_exists( 'WP_Mixpanel' ) )
-	//	return;
-
-	//wp_mixpanel()->set_api_key( CGC_MIXPANEL_API );
-	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
-
-	$user = get_userdata( $user_id );
-
-	$mp->identify( $user->user_login );
-
-	$person_props                 = array();
-	$person_props['$first_name']  = $user->first_name;
-	$person_props['$last_name']   = $user->last_name;
-	$person_props['$username']    = $user->user_login;
-	$person_props['$email']       = $user->user_email;
-	$person_props['$ip']          = cgc_mixpanel_get_ip();
-
-	if( function_exists( 'rcp_get_subscription' ) ) {
-		$person_props['Subscription'] = rcp_get_subscription( $user_id );
-	}
-
-	//wp_mixpanel()->track_person( $user_id, $person_props );
-	$mp->people->set( $user->user_login, $person_props );
-
-	$event_props                  = array();
-	$event_props['distinct_id']   = $user->user_login;
-	$event_props['sign_on_page']  = $_SERVER['HTTP_REFERER'];
-	$event_props['Date']          = time();
-	$event_props['$ip']           = cgc_mixpanel_get_ip();
-	if( function_exists( 'rcp_get_subscription' ) ) {
-		$event_props['Subscription'] = rcp_get_subscription( $user_id );
-		$event_props['Status']       = rcp_get_status( $user_id );
-		$event_props['Recurring']    = rcp_is_recurring( $user_id ) ? 'Yes' : 'No';
-	}
-
-	//wp_mixpanel()->track_event( 'Login', $event_props );
-	$mp->track( 'Login', $event_props );
-
-}
-add_action( 'set_auth_cookie', 'cgc_mixpanel_user_login', 10, 5 );
 
 
 function cgc_mixpanel_invalid_captcha() {
