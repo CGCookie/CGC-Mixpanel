@@ -41,6 +41,7 @@ function cgc_mixpanel_js() {
 
 				mixpanel.alias( response.user_login );
 				mixpanel.identify( response.user_login );
+				console.log( response );
 
 			}
 		}).fail(function (response) {
