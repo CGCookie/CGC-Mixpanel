@@ -107,6 +107,36 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 }
 add_action( 'set_auth_cookie', 'cgc_mixpanel_user_login', 10, 5 );
 
+// Track general signups
+function cgc_rcp_track_account_created( $user_id ) {
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user = get_userdata( $user_id );
+
+	$person_props                  = array();
+	$person_props['$first_name']   = $user->first_name;
+	$person_props['$last_name']    = $user->last_name;
+	$person_props['$email']        = $user->user_email;
+	$person_props['$username']     = $user->user_login;
+	$person_props['$ip']           = cgc_mixpanel_get_ip();
+	$person_props['Account Status']= 'Free';
+	$person_props['$created']      = date( 'Y-m-d' );
+
+	$mp->people->set( $user->user_login, $person_props );
+
+	$event_props                   = array();
+	$event_props['distinct_id']    = $user->user_login;
+	$event_props['Account Type']   = 'Basic';
+	$event_props['Account Status'] = 'Free';
+	$event_props['Email']          = $user->user_email;
+	$event_props['Account Created Date'] = date( 'Y-m-d' );
+
+	$mp->identify( $user->user_login );
+	$mp->track( 'Account Created', $event_props );
+}
+add_action( 'cgc_rcp_account_created', 'cgc_rcp_track_account_created', 10, 3 );
+
 /*
 function cgc_mixpanel_javascript() {
 ?>
@@ -153,97 +183,6 @@ jQuery(document).ready(function($) {
 }
 add_action( 'wp_head', 'cgc_mixpanel_javascript');
 
-
-// Track general signups
-function cgc_rcp_track_initial_signup( $post_data, $user_id, $price ) {
-
-	if( is_user_logged_in() )
-		return;
-
-	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
-
-	$user         = get_userdata( $user_id );
-	$subscription = rcp_get_subscription( $user_id );
-	$rcp_payments = new RCP_Payments;
-	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
-	$user_time    = strtotime( $user->user_registered );
-	$ten_min_ago  = strtotime( '-10 Minutes' );
-	$renewal      = ! empty( $new_user );
-	$upgrade      = $user_time < $ten_min_ago && ! $renewal ? true : false;
-
-
-	$person_props                  = array();
-	$person_props['$first_name']   = $user->first_name;
-	$person_props['$last_name']    = $user->last_name;
-	$person_props['$email']        = $user->user_email;
-	$person_props['$username']     = $user->user_login;
-	$person_props['Subscription']  = $subscription;
-	$person_props['Status']        = $price > '0' ? 'Pending' : 'Free';
-	$person_props['$ip']           = cgc_mixpanel_get_ip();
-	//wp_mixpanel()->track_person( $user_id, $person_props );
-	$mp->people->set( $user->user_login, $person_props );
-
-	$event_props                   = array();
-	$event_props['distinct_id']    = $user->user_login;
-	$event_props['Subscription']   = $subscription;
-
-	$mp->identify( $user->user_login );
-	$mp->track( 'User Signup', $event_props );
-}
-add_action( 'rcp_form_processing', 'cgc_rcp_track_initial_signup', 10, 3 );
-
-// Track PayPal signup
-function cgc_rcp_confirm_paid_paypal_signup( $payment_data, $user_id, $posted ) {
-	if( ! function_exists( 'rcp_get_subscription_name' ) )
-		return;
-
-	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
-
-	$user         = get_userdata( $user_id );
-	$subscription = rcp_get_subscription( $user_id );
-	$rcp_payments = new RCP_Payments;
-	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
-	$user_time    = strtotime( $user->user_registered );
-	$ten_min_ago  = strtotime( '-10 Minutes' );
-	$renewal      = ! empty( $new_user );
-	$upgrade      = $user_time < $ten_min_ago && ! $renewal ? true : false;
-
-	$mp->identify( $user->user_login );
-
-	$person_props                 = array();
-	$person_props['$first_name']  = $user->first_name;
-	$person_props['$last_name']   = $user->last_name;
-	$person_props['$email']       = $user->user_email;
-	$person_props['$username']    = $user->user_login;
-	$person_props['Subscription'] = $subscription;
-	$person_props['Status']       = 'Active';
-	switch( $posted['txn_type'] ) :
-
-		// New subscription
-		case 'subscr_signup' :
-
-			$event_props                   = array();
-			$event_props['distinct_id']    = $user->user_login;
-			$event_props['Subscription']   = $subscription;
-			$event_props['$created']       = time();
-			$event_props['Payment Method'] = 'PayPal';
-
-			if( $upgrade ) {
-				$mp->track( 'Citizen Upgrade', $event_props );
-			} elseif( $renewal ) {
-				$mp->track( 'Citizen Renewal', $event_props );
-			}
-
-			$person_props['Recurring'] = 'Yes';
-
-			break;
-
-	endswitch;
-
-	$mp->people->set( $user->user_login, $person_props );
-
-}
-add_action( 'rcp_valid_ipn', 'cgc_rcp_confirm_paid_paypal_signup', 10, 3 );
 
 // Track Stripe signup
 function cgc_rcp_confirm_paid_stripe_signup( $user_id, $data ) {
@@ -422,51 +361,6 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 }
 add_action( 'rcp_strip_customer.subscription.deleted', 'cgc_rcp_track_cancelled_stripe' );
 
-
-function cgc_mixpanel_invalid_captcha() {
-	global $user_ID;
-	$codes = rcp_errors()->get_error_codes();
-	if( $codes ) {
-		foreach( $codes as $code ) {
-			if( $code == 'invalid_recaptcha' ) {
-				$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
-
-				if( is_user_logged_in() ) {
-
-					$user = get_userdata( $user_ID );
-
-					$mp->identify( $user->user_login );
-
-					$person_props                 = array();
-					$person_props['$first_name']  = $user->first_name;
-					$person_props['$last_name']   = $user->last_name;
-					$person_props['$username']    = $user->user_login;
-					$person_props['$email']       = $user->user_email;
-					$person_props['$ip']           = cgc_mixpanel_get_ip();
-
-					if( function_exists( 'rcp_get_subscription' ) ) {
-						$person_props['Subscription'] = rcp_get_subscription( $user_ID );
-					}
-
-					$mp->people->set( $user->user_login, $person_props );
-
-				}
-
-				$event_props = array();
-				if( is_user_logged_in() ) {
-					$event_props['distinct_id']  = $user->user_login;
-					$event_props['Subscription'] = rcp_get_subscription( $user_ID );
-				} else {
-					$event_props['Subscription']       = rcp_get_subscription_name( $_POST['rcp_level'] );
-					$event_props['Requested Username'] = $_POST['rcp_user_login'];
-				}
-
-				$mp->track( 'Form Submit: reCaptcha Fail', $event_props );
-			}
-		}
-	}
-}
-add_action( 'rcp_form_errors', 'cgc_mixpanel_invalid_captcha', 999 );
 
 
 
