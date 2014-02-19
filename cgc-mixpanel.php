@@ -121,7 +121,7 @@ function cgc_rcp_track_account_created( $user_id ) {
 	$person_props['$username']     = $user->user_login;
 	$person_props['$ip']           = cgc_mixpanel_get_ip();
 	$person_props['Account Status']= 'Free';
-	$person_props['$created']      = date( 'Y-m-d' );
+	$person_props['$created']      = date( 'Y-m-d H:i:s' );
 
 	$mp->people->set( $user->user_login, $person_props );
 
@@ -130,7 +130,7 @@ function cgc_rcp_track_account_created( $user_id ) {
 	$event_props['Account Type']   = 'Basic';
 	$event_props['Account Status'] = 'Free';
 	$event_props['Email']          = $user->user_email;
-	$event_props['Account Created Date'] = date( 'Y-m-d' );
+	$event_props['Account Created Date'] = date( 'Y-m-d H:i:s' );
 
 	$mp->identify( $user->user_login );
 	$mp->track( 'Account Created', $event_props );
