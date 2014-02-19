@@ -7,14 +7,19 @@
  * Version: 1.0
  */
 
-if( ! defined( 'CGC_MIXPANEL_API' ) ) {
-	define( 'CGC_MIXPANEL_API', '018006ab8a267cc6d0a158dbfe41801a' );
+if( strpos( home_url(), 'staging' ) !== false ) {
+	define( 'CGC_MIXPANEL_API', '207a9aafeae87dcf4a66c3b5490bbbc9' );
+} else {
+	define( 'CGC_MIXPANEL_API', 'bc9dfb4de83d2bf2f968eaa9ce2e0cc7' );
 }
 
 if( ! class_exists( 'Mixpanel' ) ) {
 	require dirname( __FILE__ ) . '/mixpanel/lib/Mixpanel.php';
 }
 
+
+
+/*
 function cgc_mixpanel_javascript() {
 ?>
 <!-- start Mixpanel -->
@@ -252,35 +257,6 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
 	$mp->identify( $user->user_login );
-
-	/*
-	// We check for $_POST to make sure this only fires on the signup form
-	if( 'free' === $new_status && isset( $_POST['rcp_level'] ) ) {
-
-		$user                         = get_userdata( $user_id );
-
-		$person_props                 = array();
-		$person_props['$first_name']  = $user->first_name;
-		$person_props['$last_name']   = $user->last_name;
-		$person_props['$email']       = $user->user_email;
-		$person_props['$username']    = $user->user_login;
-		$person_props['Subscription'] = rcp_get_subscription( $user_id );
-		$person_props['Status']       = 'free';
-
-		$mp->people->set( $user_id, $person_props );
-		//wp_mixpanel()->track_person( $user_id, $person_props );
-
-		$event_props                 = array();
-		$event_props['distinct_id']  = $user_id;
-		$event_props['Subscription'] = rcp_get_subscription( $user_id );
-		$event_props['Date']         = time();
-		$event_props['renewal']      = 'No';
-
-		//wp_mixpanel()->track_event( 'Signup', $event_props );
-		$mp->track( 'Signup', $event_props );
-
-	} else
-	*/
 
 	if( 'expired' === $new_status ) {
 
@@ -577,7 +553,7 @@ function cgc_edd_track_purchase( $payment_id, $new_status, $old_status ) {
 	$mp->people->trackCharge( $distinct, $amount );
 }
 add_action( 'edd_update_payment_status', 'cgc_edd_track_purchase', 100, 3 );
-
+*/
 
 /**
  * Get User IP
