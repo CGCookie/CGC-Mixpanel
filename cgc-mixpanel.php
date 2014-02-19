@@ -30,7 +30,7 @@ function cgc_mixpanel_js() {
 	var logged_in = cgc_get_query_vars()["logged-in"];
 
 	if( logged_in ) {
-		$.ajax({
+		jQuery.ajax({
 			type: "POST",
 			data: {
 				action: 'cgc_mixpanel_identify'
