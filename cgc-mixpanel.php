@@ -42,11 +42,6 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$event_props                  = array();
 	$event_props['distinct_id']   = $user->user_login;
 	$event_props['$ip']           = cgc_mixpanel_get_ip();
-	$event_props['Date']          = time();
-	if( function_exists( 'rcp_get_subscription' ) ) {
-		$event_props['Account Type'] = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
-		$event_props['Payment Term'] = rcp_get_subscription( $user_id );
-	}
 
 	$mp->track( 'Login', $event_props );
 
