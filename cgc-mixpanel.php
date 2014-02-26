@@ -146,53 +146,48 @@ function cgc_rcp_track_account_created( $user_id ) {
 }
 add_action( 'cgc_rcp_account_created', 'cgc_rcp_track_account_created', 10, 3 );
 
-/*
-function cgc_mixpanel_javascript() {
-?>
-<!-- start Mixpanel -->
-<script type="text/javascript">(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f);b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==
-typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");for(g=0;g<i.length;g++)f(c,i[g]);
-b._i.push([a,e,d])};b.__SV=1.2}})(document,window.mixpanel||[]);
-mixpanel.init("018006ab8a267cc6d0a158dbfe41801a");
-<?php if( is_page( 'membership' ) ) : ?>
-	// Send event for landing on membership
-	mixpanel.track( 'Page View: membership' );
-<?php elseif( is_page( 'shop' ) ) : ?>
-	<?php if( is_user_logged_in() ) : $user_data = get_userdata( get_current_user_id() );?>
-	mixpanel.identify( '<?php echo $user_data->user_login; ?>' );
-	<?php endif; ?>
-	mixpanel.track( 'Page View: Shop' );
-<?php elseif( is_singular( 'download' ) ) : ?>
-	<?php if( is_user_logged_in() ) : $user_data = get_userdata( get_current_user_id() );?>
-	mixpanel.identify( '<?php echo $user_data->user_login; ?>' );
-	<?php endif; ?>
-	mixpanel.track( 'Page View: Shop Product', { 'product': '<?php the_title_attribute(); ?>' } );
-<?php endif; ?>
-<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
-mixpanel.track( 'Page View: registration' );
-jQuery(document).ready(function($) {
-	jQuery('#rcp_registration_form').submit(function( event ) {
-		event.preventDefault();
-		var $form = $(this);
-		var subscription = $form.find('.radio input:checked').next().text();
-		mixpanel.track( 'Form Submit: Registration', { 'Subscription' : subscription }, function() {
-			mixpanel.alias( jQuery('#rcp_user_login').val() );
-			setTimeout(function(){
-				$form.get(0).submit();
-			}, 2000);
-		});
-	} );
-});
-<?php elseif( is_page( 'registration' ) ) : $user_data = get_userdata( get_current_user_id() ); ?>
-	mixpanel.identify( '<?php echo $user_data->user_login; ?>' );
-	mixpanel.track( 'Page View: registration' );
-<?php endif; ?>
-</script><!-- end Mixpanel -->
-<?php
+
+// Track recurring payment
+function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
+
+	if( ! function_exists( 'rcp_get_subscription_name' ) )
+		return;
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user = get_userdata( $args['user_id'] );
+
+	$mp->identify( $user->user_login );
+
+	$rcp_payments = new RCP_Payments;
+	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
+	$user_time    = strtotime( $user->user_registered );
+	$ten_min_ago  = strtotime( '-10 Minutes' );
+	$renewal      = ! empty( $new_user );
+
+	$person_props                  = array();
+	$person_props['$first_name']   = $user->first_name;
+	$person_props['$last_name']    = $user->last_name;
+	$person_props['$email']        = $user->user_email;
+	$person_props['$username']     = $user->user_login;
+	$person_props['Account Type']  = 'Citizen';
+	$person_props['Account Status']= ucwords( rcp_get_status( $user->ID ) );
+
+	$mp->people->set( $user->user_login, $person_props );
+
+	$event_props                 = array();
+	$event_props['distinct_id']  = $user->user_login;
+	$event_props['Value']        = $amount;
+	$event_props['Payment Term'] = rcp_get_subscription( $user_id );
+	$event_props['Payment Type'] = $renewal ? 'Renewal' : 'Initial';
+
+	$mp->track( 'Membership Payment', $event_props );
+
+	$mp->people->trackCharge( $user->user_login, $amount );
 }
-add_action( 'wp_head', 'cgc_mixpanel_javascript');
+add_action( 'rcp_insert_payment', 'cgc_rcp_track_payment', 10, 3 );
 
-
+/*
 // Track Stripe signup
 function cgc_rcp_confirm_paid_stripe_signup( $user_id, $data ) {
 
@@ -241,45 +236,6 @@ function cgc_rcp_confirm_paid_stripe_signup( $user_id, $data ) {
 
 }
 add_action( 'rcp_stripe_signup', 'cgc_rcp_confirm_paid_stripe_signup', 10, 2 );
-
-// Track recurring payment
-function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
-
-	if( ! function_exists( 'rcp_get_subscription_name' ) )
-		return;
-
-	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
-
-	$user = get_userdata( $args['user_id'] );
-
-	$mp->identify( $user->user_login );
-
-	$subscription = rcp_get_subscription( $args['user_id'] );
-
-	$person_props                  = array();
-	$person_props['$first_name']   = $user->first_name;
-	$person_props['$last_name']    = $user->last_name;
-	$person_props['$email']        = $user->user_email;
-	$person_props['$username']     = $user->user_login;
-	$person_props['Subscription']  = $subscription;
-	$person_props['Status']        = ucwords( rcp_get_status( $user->ID ) );
-	$person_props['Recurring']     = rcp_is_recurring( $args['user_id'] ) ? 'Yes' : 'No';
-
-	$mp->people->set( $user->user_login, $person_props );
-
-
-	$event_props                 = array();
-	$event_props['distinct_id']  = $user->user_login;
-	$event_props['Subscription'] = $subscription;
-	$event_props['Amount']       = $amount;
-	$event_props['Date']         = time();
-	$event_props['Payment Method']= $args['payment_type'];
-
-	$mp->track( 'Subscription Payment', $event_props );
-
-	$mp->people->trackCharge( $user->user_login, $amount );
-}
-add_action( 'rcp_insert_payment', 'cgc_rcp_track_payment', 10, 3 );
 
 
 function cgc_rcp_track_status_changes( $new_status, $user_id ) {
