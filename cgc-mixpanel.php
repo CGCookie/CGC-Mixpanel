@@ -18,6 +18,10 @@ if( ! class_exists( 'Mixpanel' ) ) {
 }
 
 function cgc_mixpanel_js() {
+
+	global $user_login;
+	get_currentuserinfo();
+
 ?>
 	<script type="text/javascript">
 
@@ -49,6 +53,13 @@ function cgc_mixpanel_js() {
 		});
 
 	}
+
+	<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
+		mixpanel.track( 'Page View: registration' );
+	<?php if( is_page( 'registration' ) && is_user_logged_in() ) : ?>
+		mixpanel.identify( '<?php echo $user_login; ?>' );
+		mixpanel.track( 'Page View: registration' );
+	<?php endif; ?>
 
 	function cgc_get_query_vars() {
 		var vars = [], hash;
