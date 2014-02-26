@@ -160,7 +160,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$mp->identify( $user->user_login );
 
 	$rcp_payments = new RCP_Payments;
-	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
+	$new_user     = $rcp_payments->last_payment_of_user( $user->ID );
 	$user_time    = strtotime( $user->user_registered );
 	$ten_min_ago  = strtotime( '-10 Minutes' );
 	$renewal      = ! empty( $new_user );
@@ -178,7 +178,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$event_props                 = array();
 	$event_props['distinct_id']  = $user->user_login;
 	$event_props['Value']        = $amount;
-	$event_props['Payment Term'] = rcp_get_subscription( $user_id );
+	$event_props['Payment Term'] = rcp_get_subscription( $user->ID );
 	$event_props['Payment Type'] = $renewal ? 'Renewal' : 'Initial';
 
 	$mp->track( 'Membership Payment', $event_props );
