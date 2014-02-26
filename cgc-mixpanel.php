@@ -161,8 +161,6 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
 	$rcp_payments = new RCP_Payments;
 	$new_user     = $rcp_payments->last_payment_of_user( $user->ID );
-	$user_time    = strtotime( $user->user_registered );
-	$ten_min_ago  = strtotime( '-10 Minutes' );
 	$renewal      = ! empty( $new_user );
 
 	$person_props                  = array();
@@ -171,7 +169,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$person_props['$email']        = $user->user_email;
 	$person_props['$username']     = $user->user_login;
 	$person_props['Account Type']  = 'Citizen';
-	$person_props['Account Status']= ucwords( rcp_get_status( $user->ID ) );
+	$person_props['Account Status']= 'Active';
 
 	$mp->people->set( $user->user_login, $person_props );
 
@@ -186,6 +184,46 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$mp->people->trackCharge( $user->user_login, $amount );
 }
 add_action( 'rcp_insert_payment', 'cgc_rcp_track_payment', 10, 3 );
+
+function cgc_rcp_track_cancelled_paypal( $user_id ) {
+	$user                          = get_userdata( $user_id );
+	$person_props                  = array();
+	$person_props['$first_name']   = $user->first_name;
+	$person_props['$last_name']    = $user->last_name;
+	$person_props['$email']        = $user->user_email;
+	$person_props['$username']     = $user->user_login;
+	$person_props['Account Status']= 'Cancelled';
+
+	$mp->people->set( $user->user_login, $person_props );
+
+	$event_props                 = array();
+	$event_props['distinct_id']  = $user->user_login;
+	$event_props['Reason']       = 'Cancelled';
+
+	$mp->track( 'Membership Termination', $event_props );
+}
+add_action( 'rcp_ipn_subscr_cancel', 'cgc_rcp_track_cancelled_paypal' );
+
+function cgc_rcp_track_cancelled_stripe( $invoice ) {
+
+	$user_id                       = rcp_stripe_get_user_id( $invoice->customer );
+	$user                          = get_userdata( $user_id );
+	$person_props                  = array();
+	$person_props['$first_name']   = $user->first_name;
+	$person_props['$last_name']    = $user->last_name;
+	$person_props['$email']        = $user->user_email;
+	$person_props['$username']     = $user->user_login;
+	$person_props['Account Status']= 'Cancelled';
+
+	$mp->people->set( $user->user_login, $person_props );
+
+	$event_props                 = array();
+	$event_props['distinct_id']  = $user->user_login;
+	$event_props['Reason']       = 'Cancelled';
+
+	$mp->track( 'Membership Termination', $event_props );
+}
+add_action( 'rcp_strip_customer.subscription.deleted', 'cgc_rcp_track_cancelled_stripe' );
 
 /*
 // Track Stripe signup
@@ -275,57 +313,6 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 	}
 }
 add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
-
-function cgc_rcp_track_cancelled_paypal( $user_id ) {
-	$user                         = get_userdata( $user_id );
-	$person_props                 = array();
-	$person_props['$first_name']  = $user->first_name;
-	$person_props['$last_name']   = $user->last_name;
-	$person_props['$email']       = $user->user_email;
-	$person_props['$username']    = $user->user_login;
-	$person_props['Subscription'] = rcp_get_subscription( $user_id );
-	$person_props['Status']       = 'Cancelled';
-	$person_props['Recurring']    = 'No';
-
-	//wp_mixpanel()->track_person( $user_id, $person_props );
-	$mp->people->set( $user->user_login, $person_props );
-
-	$event_props                 = array();
-	$event_props['distinct_id']  = $user->user_login;
-	$event_props['Subscription'] = rcp_get_subscription( $user_id );
-	$event_props['Reason']       = 'Cancelled';
-	$event_props['Date']         = time();
-
-	$mp->track( 'Lost Citizen', $event_props );
-}
-add_action( 'rcp_ipn_subscr_cancel', 'cgc_rcp_track_cancelled_paypal' );
-
-function cgc_rcp_track_cancelled_stripe( $invoice ) {
-
-	$user_id                      = rcp_stripe_get_user_id( $invoice->customer );
-	$user                         = get_userdata( $user_id );
-	$person_props                 = array();
-	$person_props['$first_name']  = $user->first_name;
-	$person_props['$last_name']   = $user->last_name;
-	$person_props['$email']       = $user->user_email;
-	$person_props['$username']    = $user->user_login;
-	$person_props['Subscription'] = rcp_get_subscription( $user_id );
-	$person_props['Status']       = 'Cancelled';
-	$person_props['Recurring']    = 'No';
-
-	//wp_mixpanel()->track_person( $user_id, $person_props );
-	$mp->people->set( $user->user_login, $person_props );
-
-	$event_props                 = array();
-	$event_props['distinct_id']  = $user->user_login;
-	$event_props['Subscription'] = rcp_get_subscription( $user_id );
-	$event_props['Reason']       = 'Cancelled';
-	$event_props['Date']         = time();
-
-	$mp->track( 'Lost Citizen', $event_props );
-}
-add_action( 'rcp_strip_customer.subscription.deleted', 'cgc_rcp_track_cancelled_stripe' );
-
 
 
 
