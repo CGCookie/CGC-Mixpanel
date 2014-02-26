@@ -101,7 +101,16 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$event_props                  = array();
 	$event_props['distinct_id']   = $user->user_login;
 	$event_props['$ip']           = cgc_mixpanel_get_ip();
-
+	if( function_exists( 'rcp_get_subscription' ) ) {
+		$event_props['Account Type']   = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
+		if( rcp_is_active( $user_id ) ) {
+			$event_props['Account Status'] = 'Active';
+		} elseif ( rcp_is_expired( $user_id ) ) {
+			$event_props['Account Status'] = 'Expired';
+		} else {
+			$event_props['Account Status'] = 'Free';
+		}
+	}
 	$mp->track( 'Login', $event_props );
 
 }
