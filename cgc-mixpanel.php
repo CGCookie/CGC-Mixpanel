@@ -225,6 +225,39 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 }
 add_action( 'rcp_strip_customer.subscription.deleted', 'cgc_rcp_track_cancelled_stripe' );
 
+
+function cgc_rcp_track_status_changes( $new_status, $user_id ) {
+
+	if( ! function_exists( 'rcp_get_subscription_name' ) )
+		return;
+
+	$user = get_userdata( $user_id );
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$mp->identify( $user->user_login );
+
+	if( 'expired' === $new_status ) {
+
+		$person_props                 = array();
+		$person_props['$first_name']  = $user->first_name;
+		$person_props['$last_name']   = $user->last_name;
+		$person_props['$email']       = $user->user_email;
+		$person_props['$username']    = $user->user_login;
+		$person_props['Account Status']= 'Expired';
+
+		$mp->people->set( $user->user_login, $person_props );
+
+		$event_props                 = array();
+		$event_props['distinct_id']  = $user->user_login;
+		$event_props['Reason']       = 'Expired';
+
+		$mp->track( 'Membership Termination', $event_props );
+
+	}
+}
+add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
+
 /*
 // Track Stripe signup
 function cgc_rcp_confirm_paid_stripe_signup( $user_id, $data ) {
@@ -274,47 +307,6 @@ function cgc_rcp_confirm_paid_stripe_signup( $user_id, $data ) {
 
 }
 add_action( 'rcp_stripe_signup', 'cgc_rcp_confirm_paid_stripe_signup', 10, 2 );
-
-
-function cgc_rcp_track_status_changes( $new_status, $user_id ) {
-
-	if( ! function_exists( 'rcp_get_subscription_name' ) )
-		return;
-
-	$user = get_userdata( $user_id );
-
-	//wp_mixpanel()->set_api_key( CGC_MIXPANEL_API );
-	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
-
-	$mp->identify( $user->user_login );
-
-	if( 'expired' === $new_status ) {
-
-		$person_props                 = array();
-		$person_props['$first_name']  = $user->first_name;
-		$person_props['$last_name']   = $user->last_name;
-		$person_props['$email']       = $user->user_email;
-		$person_props['$username']    = $user->user_login;
-		$person_props['Subscription'] = rcp_get_subscription( $user_id );
-		$person_props['Status']       = 'Expired';
-		$person_props['Recurring']    = 'No';
-
-		//wp_mixpanel()->track_person( $user_id, $person_props );
-		$mp->people->set( $user->user_login, $person_props );
-
-		$event_props                 = array();
-		$event_props['distinct_id']  = $user->user_login;
-		$event_props['Subscription'] = rcp_get_subscription( $user_id );
-		$event_props['Reason']       = 'Expired';
-		$event_props['Date']         = time();
-
-		$mp->track( 'Lost Citizen', $event_props );
-
-	}
-}
-add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
-
-
 
 // Track when customers add items to the cart
 function cgc_edd_track_added_to_cart( $download_id = 0, $options = array() ) {
