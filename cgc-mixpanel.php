@@ -200,6 +200,8 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	if( ! function_exists( 'rcp_get_subscription_name' ) )
 		return;
 
+	global $wpdb;
+
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
 	$user = get_userdata( $args['user_id'] );
@@ -207,8 +209,10 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$mp->identify( $user->user_login );
 
 	$rcp_payments = new RCP_Payments;
-	$new_user     = $rcp_payments->last_payment_of_user( $user->ID );
-	$renewal      = ! empty( $new_user );
+
+	// Get the last payment of the user
+	$last_payment = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM " . rcp_get_payments_db_name() . " WHERE `user_id`='%d' AND id < '%d' ORDER BY id DESC LIMIT 1;", $user_id, $payment_id ) );
+	$renewal      = ! empty( $last_payment );
 
 	$person_props                  = array();
 	$person_props['$first_name']   = $user->first_name;
@@ -225,6 +229,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$event_props['Value']        = $amount;
 	$event_props['Payment Term'] = rcp_get_subscription( $user->ID );
 	$event_props['Payment Type'] = $renewal ? 'Renewal' : 'Initial';
+	$event_props['Last Payment Date'] = $renewal ? $last_payment[0]->date : '';
 
 	$mp->track( 'Membership Payment', $event_props );
 
