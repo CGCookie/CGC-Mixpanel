@@ -100,14 +100,13 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$person_props['$last_name']   = $user->last_name;
 	$person_props['$username']    = $user->user_login;
 	$person_props['$email']       = $user->user_email;
-	$person_props['$ip']          = cgc_mixpanel_get_ip();
 
 	if( function_exists( 'rcp_get_subscription' ) ) {
 		$person_props['Account Type'] = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
 		$person_props['Payment Term'] = rcp_get_subscription( $user_id );
 	}
 
-	$mp->people->set( $user->user_login, $person_props );
+	$mp->people->set( $user->user_login, $person_props, $person_props, array( 'ip' => cgc_mixpanel_get_ip() ) );
 
 	$event_props                  = array();
 	$event_props['distinct_id']   = $user->user_login;
@@ -139,12 +138,11 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 	$person_props['$last_name']    = $user->last_name;
 	$person_props['$email']        = $user->user_email;
 	$person_props['$username']     = $user->user_login;
-	$person_props['$ip']           = cgc_mixpanel_get_ip();
 	$person_props['Account Status']= 'Free';
 	$person_props['newsletters']   = implode( ',', $newsletters );
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
 
-	$mp->people->set( $user->user_login, $person_props );
+	$mp->people->set( $user->user_login, $person_props, array( 'ip' => cgc_mixpanel_get_ip() ) );
 
 	$event_props                   = array();
 	$event_props['distinct_id']    = $user->user_login;
