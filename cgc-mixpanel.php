@@ -158,6 +158,47 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 }
 add_action( 'cgc_rcp_account_created', 'cgc_rcp_track_account_created', 10, 2 );
 
+// Track account upgrade
+function cgc_rcp_account_upgrade( $user_id, $data ) {
+
+	if(  ! function_exists( 'rcp_get_subscription_name' ) )
+		return;
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user         = get_userdata( $user_id );
+
+	$mp->identify( $user->user_login );
+
+	$subscription = rcp_get_subscription( $user_id );
+	$rcp_payments = new RCP_Payments;
+	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
+	$user_time    = strtotime( $user->user_registered );
+	$renewal      = ! empty( $new_user );
+	$upgrade      = $user_time < $ten_min_ago && ! $renewal ? true : false;
+
+	$person_props                  = array();
+	$person_props['$first_name']   = $user->first_name;
+	$person_props['$last_name']    = $user->last_name;
+	$person_props['$email']        = $user->user_email;
+	$person_props['$username']     = $user->user_login;
+	$person_props['Account Status']= 'Active';
+	$person_props['$created']      = date( 'Y-m-d H:i:s' );
+
+	$mp->people->set( $user->user_login, $person_props, array( 'ip' => cgc_mixpanel_get_ip() ) );
+
+	$event_props                   = array();
+	$event_props['distinct_id']    = $user->user_login;
+	$event_props['Account Type']   = 'Citizen';
+	$event_props['Account Status'] = 'Active';
+	$event_props['Account Level']  = $subscription;
+	$event_props['Renewal']        = $renewal ? 'Yes' : 'No';
+	$event_props['Time Since Creation'] = human_time_diff( $user_time, current_time( 'timestamp' ) );
+
+	$mp->track( 'Account Upgraded', $event_props );
+
+}
+add_action( 'rcp_stripe_signup', 'cgc_rcp_account_upgrade', 10, 2 );
 
 // Track recurring payment
 function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
@@ -271,54 +312,6 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
 
 /*
-// Track Stripe signup
-function cgc_rcp_confirm_paid_stripe_signup( $user_id, $data ) {
-
-	if(  ! function_exists( 'rcp_get_subscription_name' ) )
-		return;
-
-	//wp_mixpanel()->set_api_key( CGC_MIXPANEL_API );
-
-	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
-
-	$user         = get_userdata( $user_id );
-
-	$mp->identify( $user->user_login );
-
-	$subscription = rcp_get_subscription( $user_id );
-	$rcp_payments = new RCP_Payments;
-	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
-	$user_time    = strtotime( $user->user_registered );
-	$ten_min_ago  = strtotime( '-10 Minutes' );
-	$renewal      = ! empty( $new_user );
-	$upgrade      = $user_time < $ten_min_ago && ! $renewal ? true : false;
-
-	$person_props                  = array();
-	$person_props['$first_name']   = $user->first_name;
-	$person_props['$last_name']    = $user->last_name;
-	$person_props['$email']        = $user->user_email;
-	$person_props['$username']     = $user->user_login;
-	$person_props['Subscription']  = $subscription;
-	$person_props['Status']        = 'Active';
-	$person_props['Recurring']     = isset( $data['auto_renew'] ) ? 'Yes' : 'No';
-
-	$mp->people->set( $user->user_login, $person_props );
-
-	$event_props                   = array();
-	$event_props['distinct_id']    = $user->user_login;
-	$event_props['Subscription']   = $subscription;
-	$event_props['Date']           = time();
-	$event_props['Payment Method'] = 'Stripe';
-
-
-	if( $upgrade ) {
-		$mp->track( 'Citizen Upgrade', $event_props );
-	} elseif( $renewal ) {
-		$mp->track( 'Citizen Renewal', $event_props );
-	}
-
-}
-add_action( 'rcp_stripe_signup', 'cgc_rcp_confirm_paid_stripe_signup', 10, 2 );
 
 // Track when customers add items to the cart
 function cgc_edd_track_added_to_cart( $download_id = 0, $options = array() ) {
