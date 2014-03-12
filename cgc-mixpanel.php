@@ -108,7 +108,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 
 	}
 
-	$mp->people->set( $user->user_login, $person_props, $person_props, array( 'ip' => cgc_mixpanel_get_ip() ) );
+	$mp->people->set( $user->user_login, $person_props, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
 
 	$event_props                  = array();
 	$event_props['distinct_id']   = $user->user_login;
@@ -138,7 +138,7 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 	$person_props['newsletters']   = implode( ',', $newsletters );
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
 
-	$mp->people->set( $user->user_login, $person_props, array( 'ip' => cgc_mixpanel_get_ip() ) );
+	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
 
 	$event_props                   = array();
 	$event_props['distinct_id']    = $user->user_login;
@@ -179,7 +179,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$person_props['Account Status']= 'Active';
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
 
-	$mp->people->set( $user->user_login, $person_props, array( 'ip' => cgc_mixpanel_get_ip() ) );
+	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
 
 	$event_props                   = array();
 	$event_props['distinct_id']    = $user->user_login;
