@@ -128,7 +128,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 add_action( 'set_auth_cookie', 'cgc_mixpanel_user_login', 10, 5 );
 
 // Track general signups
-function cgc_rcp_track_account_created( $user_id ) {
+function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
@@ -141,6 +141,7 @@ function cgc_rcp_track_account_created( $user_id ) {
 	$person_props['$username']     = $user->user_login;
 	$person_props['$ip']           = cgc_mixpanel_get_ip();
 	$person_props['Account Status']= 'Free';
+	$person_props['newsletters']   = implode( ',', $newsletters );
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
 
 	$mp->people->set( $user->user_login, $person_props );
@@ -155,7 +156,7 @@ function cgc_rcp_track_account_created( $user_id ) {
 	$mp->identify( $user->user_login );
 	$mp->track( 'Account Created', $event_props );
 }
-add_action( 'cgc_rcp_account_created', 'cgc_rcp_track_account_created', 10, 3 );
+add_action( 'cgc_rcp_account_created', 'cgc_rcp_track_account_created', 10, 2 );
 
 
 // Track recurring payment
