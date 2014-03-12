@@ -211,7 +211,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$rcp_payments = new RCP_Payments;
 
 	// Get the last payment of the user
-	$last_payment = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM " . rcp_get_payments_db_name() . " WHERE `user_id`='%d' AND id < '%d' ORDER BY id DESC LIMIT 1;", $$args['user_id'], $payment_id ) );
+	$last_payment = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM " . rcp_get_payments_db_name() . " WHERE `user_id`='%d' AND id < '%d' ORDER BY id DESC LIMIT 1;", $args['user_id'], $payment_id ) );
 	$renewal      = ! empty( $last_payment );
 
 	$person_props                  = array();
