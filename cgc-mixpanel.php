@@ -222,6 +222,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$person_props['$username']     = $user->user_login;
 	$person_props['Account Type']  = 'Citizen';
 	$person_props['Account Status']= 'Active';
+	$person_props['Payment Term'] = rcp_get_subscription( $user->ID );
 
 	$mp->people->set( $user->user_login, $person_props );
 
