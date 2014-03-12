@@ -102,8 +102,10 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$person_props['$email']       = $user->user_email;
 
 	if( function_exists( 'rcp_get_subscription' ) ) {
+
 		$person_props['Account Type'] = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
 		$person_props['Payment Term'] = rcp_get_subscription( $user_id );
+
 	}
 
 	$mp->people->set( $user->user_login, $person_props, $person_props, array( 'ip' => cgc_mixpanel_get_ip() ) );
