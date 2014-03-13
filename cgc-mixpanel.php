@@ -167,6 +167,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 
 	$subscription = rcp_get_subscription( $user_id );
 	$expiration   = rcp_get_expiration_date( $user_id );
+	$recurring    = rcp_is_recurring( $user_id );
 	$rcp_payments = new RCP_Payments;
 	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
 	$user_time    = strtotime( $user->user_registered, current_time( 'timestamp' ) );
@@ -187,6 +188,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$event_props['distinct_id']    = $user->user_login;
 	$event_props['Account Type']   = 'Citizen';
 	$event_props['Account Status'] = 'Active';
+	$event_props['Recurring']	   = $recurring;
 	$event_props['Expiration']	   = $expiration;
 	$event_props['Account Level']  = $subscription;
 	$event_props['Renewal']        = $renewal ? 'Yes' : 'No';
