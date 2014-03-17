@@ -105,6 +105,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 
 		$person_props['Account Type'] = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
 		$person_props['Payment Term'] = rcp_get_subscription( $user_id );
+		$person_props['Account Status'] = ucwords( rcp_get_status( $user_id ) );
 
 	}
 
