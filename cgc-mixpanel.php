@@ -45,6 +45,7 @@ function cgc_mixpanel_js() {
 			url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
 			success: function (response) {
 
+				mixpanel.alias( response.distinct_id );
 				mixpanel.identify( response.user_login );
 
 			}
@@ -82,7 +83,10 @@ function cgc_mixpanel_ajax() {
 	if( is_user_logged_in() ) {
 		global $user_login;
 		get_currentuserinfo();
-		echo json_encode( array( 'user_login' => $user_login ) );
+		echo json_encode( array( 
+			'user_login' => $user_login,
+			'distinct_id' => cgc_mixpanel_get_id_from_cookie()
+			) );
 		die();
 	}
 	die('-2');
@@ -474,7 +478,7 @@ function cgc_mixpanel_get_id_from_cookie() {
 		if(strpos($name, 'mp_') === 0) {
 
 		    $chunk 	= explode(' ', stripslashes($value));
-		    $id 	= preg_replace('/[^\d-]+/', '', $chunk[1]);
+		    $id 	= preg_replace('/^[A-Z0-9 \'.-]{1,255}$/', '', $chunk[1]);
 
 		    //var_dump($cleaned);
 		    echo $id;
