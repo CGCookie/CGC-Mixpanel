@@ -7,6 +7,7 @@
  * Version: 1.0
  */
 
+
 if( strpos( home_url(), 'staging' ) !== false ) {
 	define( 'CGC_MIXPANEL_API', '207a9aafeae87dcf4a66c3b5490bbbc9' );
 } else {
