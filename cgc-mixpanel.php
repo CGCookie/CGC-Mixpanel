@@ -45,8 +45,8 @@ function cgc_mixpanel_js() {
 			url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
 			success: function (response) {
 
-				mixpanel.alias( response.distinct_id );
 				mixpanel.identify( response.user_login );
+				mixpanel.alias( response.distinct_id );
 
 			}
 		}).fail(function (response) {
@@ -60,6 +60,7 @@ function cgc_mixpanel_js() {
 	<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
 		mixpanel.track( 'Page View: registration' );
 	<?php elseif( is_page( 'registration' ) && is_user_logged_in() && strpos( $_SERVER['HTTP_REFERER'], 'registration' ) === false ) : ?>
+
 		mixpanel.identify( '<?php echo $user_login; ?>' );
 		mixpanel.track( 'Page View: registration' );
 	<?php endif; ?>
