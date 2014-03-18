@@ -46,7 +46,7 @@ function cgc_mixpanel_js() {
 			url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
 			success: function (response) {
 
-				mixpanel.alias( response.distinct_id );
+				// mixpanel.alias( response.distinct_id );
 				mixpanel.identify( response.user_login );
 
 			}
@@ -159,7 +159,7 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 	$event_props['newsletters']    = implode( ',', $newsletters );
 
 	$mp->createAlias( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
-	$mp->identify( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
+	// $mp->identify( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
 
 	$mp->track( 'Account Created', $event_props );
 }
