@@ -17,12 +17,14 @@ if( ! class_exists( 'Mixpanel' ) ) {
 	require dirname( __FILE__ ) . '/mixpanel/lib/Mixpanel.php';
 }
 
+
 function cgc_mixpanel_js() {
 
 	global $user_login;
 	get_currentuserinfo();
 
 ?>
+	<!-- Mixpanel -->
 	<script type="text/javascript">
 
 	(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f);b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==
@@ -149,7 +151,9 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 	$event_props['Account Created Date'] = date( 'Y-m-d H:i:s' );
 	$event_props['newsletters']    = implode( ',', $newsletters );
 
-	$mp->identify( $user->user_login );
+	$mp->alias( $user->user_login , cgc_mixpanel_get_id_from_cookie() );
+	$mp->identify( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
+
 	$mp->track( 'Account Created', $event_props );
 }
 add_action( 'cgc_rcp_account_created', 'cgc_rcp_track_account_created', 10, 2 );
@@ -455,6 +459,29 @@ function cgc_edd_track_purchase( $payment_id, $new_status, $old_status ) {
 }
 add_action( 'edd_update_payment_status', 'cgc_edd_track_purchase', 100, 3 );
 */
+
+/**
+ * Get ID from Cookie
+ *
+ * Returns the unique ID of in teh users cookie
+ *
+ * @since 1.0.8.2
+ * @return string $ip User's IP address
+*/
+function cgc_mixpanel_get_id_from_cookie() {
+
+	foreach($_COOKIE as $name => $value) {
+		if(strpos($name, 'mp_') === 0) {
+
+		    $chunk 	= explode(' ', stripslashes($value));
+		    $id 	= preg_replace('/[^\d-]+/', '', $chunk[1]);
+
+		    //var_dump($cleaned);
+		    return $id;
+		}
+	}
+
+}
 
 /**
  * Get User IP
