@@ -155,7 +155,7 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 	$event_props['Account Created Date'] = date( 'Y-m-d H:i:s' );
 	$event_props['newsletters']    = implode( ',', $newsletters );
 
-	$mp->alias( $user->user_login , cgc_mixpanel_get_id_from_cookie() );
+	$mp->alias( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
 	$mp->identify( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
 
 	$mp->track( 'Account Created', $event_props );
