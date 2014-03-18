@@ -481,7 +481,7 @@ function cgc_mixpanel_get_id_from_cookie() {
 		    $id 	= preg_replace('/^[A-Z0-9 \'.-]{1,255}$/', '', $chunk[1]);
 
 		    //var_dump($cleaned);
-		    echo $id;
+		    return $id;
 		}
 	}
 
