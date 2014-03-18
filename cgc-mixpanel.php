@@ -159,7 +159,7 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 	$event_props['newsletters']    = implode( ',', $newsletters );
 
 	$mp->createAlias( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
-	// $mp->identify( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
+	$mp->identify( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
 
 	$mp->track( 'Account Created', $event_props );
 }
