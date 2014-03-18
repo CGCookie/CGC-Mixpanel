@@ -46,7 +46,7 @@ function cgc_mixpanel_js() {
 			url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
 			success: function (response) {
 
-				// mixpanel.alias( response.distinct_id );
+				mixpanel.alias( response.distinct_id );
 				mixpanel.identify( response.user_login );
 
 			}
