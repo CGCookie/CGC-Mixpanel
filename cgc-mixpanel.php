@@ -321,7 +321,12 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['$last_name']   = $user->last_name;
 		$person_props['$email']       = $user->user_email;
 		$person_props['$username']    = $user->user_login;
-		$person_props['Account Status']= 'Expired';
+
+		if ('cancelled' === $new_status ) {
+			$person_props['Account Status']= 'Cancelled';
+		} else {
+			$person_props['Account Status']= 'Expired';
+		}
 
 		$mp->people->set( $user->user_login, $person_props );
 
