@@ -60,6 +60,7 @@ function cgc_mixpanel_js() {
 	<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
 		mixpanel.track( 'Page View: registration' );
 	<?php elseif( is_page( 'registration' ) && is_user_logged_in() && strpos( $_SERVER['HTTP_REFERER'], 'registration' ) === false ) : ?>
+
 		mixpanel.identify( '<?php echo $user_login; ?>' );
 		mixpanel.track( 'Page View: registration' );
 	<?php endif; ?>
@@ -313,7 +314,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 	$mp->identify( $user->user_login );
 
-	if( 'expired' === $new_status ) {
+	if( 'expired' === $new_status || 'cancelled' === $new_status ) {
 
 		$person_props                 = array();
 		$person_props['$first_name']  = $user->first_name;
@@ -326,7 +327,12 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user->user_login;
-		$event_props['Reason']       = 'Expired';
+
+		if ('cancelled' === $new_status ) {
+			$event_props['Reason']       = 'Cancelled';
+		} else {
+			$event_props['Reason']       = 'Expired';
+		}
 
 		$mp->track( 'Membership Termination', $event_props );
 
@@ -483,7 +489,7 @@ function cgc_mixpanel_get_id_from_cookie() {
 		    $id 	= preg_replace('/^[A-Z0-9 \'.-]{1,255}$/', '', $chunk[1]);
 
 		    //var_dump($cleaned);
-		    echo $id;
+		    return $id;
 		}
 	}
 
