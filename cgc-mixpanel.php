@@ -141,6 +141,7 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 	$person_props['$last_name']    = $user->last_name;
 	$person_props['$email']        = $user->user_email;
 	$person_props['$username']     = $user->user_login;
+	$person_props['Account Type']  = 'Basic'
 	$person_props['Account Status']= 'Free';
 	$person_props['newsletters']   = implode( ',', $newsletters );
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
@@ -188,6 +189,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$person_props['$last_name']    = $user->last_name;
 	$person_props['$email']        = $user->user_email;
 	$person_props['$username']     = $user->user_login;
+	$person_props['Account Type']  = 'Active';
 	$person_props['Account Status']= 'Active';
 	$person_props['Recurring']	   = $recurring;
 	$person_props['Expiration']	   = $expiration;
