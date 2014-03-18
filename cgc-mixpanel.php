@@ -312,7 +312,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 	$mp->identify( $user->user_login );
 
-	if( 'expired' === $new_status ) {
+	if( 'expired' === $new_status || 'cancelled' === $new_status ) {
 
 		$person_props                 = array();
 		$person_props['$first_name']  = $user->first_name;
@@ -325,7 +325,12 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user->user_login;
-		$event_props['Reason']       = 'Expired';
+
+		if ('cancelled' === $new_status ) {
+			$event_props['Reason']       = 'Cancelled';
+		} else {
+			$event_props['Reason']       = 'Expired';
+		}
 
 		$mp->track( 'Membership Termination', $event_props );
 
