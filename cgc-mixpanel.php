@@ -214,6 +214,54 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 }
 add_action( 'rcp_stripe_signup', 'cgc_rcp_account_upgrade', 10, 2 );
 
+// Track account upgrade via gift redemption
+function cgc_rcp_account_upgrade_via_gift( $user_id, $discount, $subscription ) {
+
+	if(  ! function_exists( 'rcp_get_subscription_name' ) )
+		return;
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user         = get_userdata( $user_id );
+
+	$mp->identify( $user->user_login );
+
+	$subscription = rcp_get_subscription( $user_id );
+	$expiration   = rcp_get_expiration_date( $user_id );
+	$rcp_payments = new RCP_Payments;
+	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
+	$user_time    = strtotime( $user->user_registered, current_time( 'timestamp' ) );
+	$renewal      = ! empty( $new_user );
+	$upgrade      = $user_time < $ten_min_ago && ! $renewal ? true : false;
+
+	$person_props                  = array();
+	$person_props['$first_name']   = $user->first_name;
+	$person_props['$last_name']    = $user->last_name;
+	$person_props['$email']        = $user->user_email;
+	$person_props['$username']     = $user->user_login;
+	$person_props['Account Type']  = 'Active';
+	$person_props['Account Status']= 'Active';
+	$person_props['Recurring']	   = 'No';
+	$person_props['Expiration']	   = $expiration;
+	$person_props['$created']      = date( 'Y-m-d H:i:s' );
+
+	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
+
+	$event_props                   = array();
+	$event_props['distinct_id']    = $user->user_login;
+	$event_props['Account Type']   = 'Citizen';
+	$event_props['Account Status'] = 'Active';
+	$event_props['Recurring']	   = 'No';
+	$event_props['Expiration']	   = $expiration;
+	$event_props['Account Level']  = $subscription;
+	$event_props['Renewal']        = $renewal ? 'Yes' : 'No';
+	$event_props['Time Since Creation'] = human_time_diff( $user_time, current_time( 'timestamp' ) );
+
+	$mp->track( 'Account Upgraded', $event_props );
+
+}
+add_action( 'cgc_gift_redeemed', 'cgc_rcp_account_upgrade_via_gift', 10, 2 );
+
 // Track recurring payment
 function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
