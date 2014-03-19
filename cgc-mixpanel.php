@@ -260,7 +260,7 @@ function cgc_rcp_account_upgrade_via_gift( $user_id, $discount, $subscription ) 
 	$mp->track( 'Account Upgraded', $event_props );
 
 }
-add_action( 'cgc_gift_redeemed', 'cgc_rcp_account_upgrade_via_gift', 10, 2 );
+add_action( 'cgc_gift_redeemed', 'cgc_rcp_account_upgrade_via_gift', 10, 3 );
 
 // Track recurring payment
 function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
