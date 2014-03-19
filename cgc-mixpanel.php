@@ -241,6 +241,7 @@ function cgc_rcp_account_upgrade_via_gift( $user_id, $discount, $subscription ) 
 	$person_props['$username']     = $user->user_login;
 	$person_props['Account Type']  = 'Citizen';
 	$person_props['Account Status']= 'Active';
+	$person_props['Account Level'] = $subscription
 	$person_props['Recurring']	   = 'No';
 	$person_props['Expiration']	   = $expiration;
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
