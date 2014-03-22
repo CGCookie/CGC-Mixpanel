@@ -296,6 +296,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$person_props['Account Status']= 'Active';
 	$person_props['Expiration']	   = $expiration;
 	$person_props['Payment Term'] = rcp_get_subscription( $user->ID );
+	$person_props['Last Payment Date'] = $renewal ? $last_payment[0]->date : '';
 
 	$mp->people->set( $user->user_login, $person_props );
 
