@@ -193,7 +193,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$person_props['$username']     = $user->user_login;
 	$person_props['Account Type']  = 'Active';
 	$person_props['Account Status']= 'Active';
-	$person_props['Account Level'] = $subscription
+	$person_props['Account Level'] = $subscription;
 	$person_props['Recurring']	   = $recurring;
 	$person_props['Expiration']	   = $expiration;
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
