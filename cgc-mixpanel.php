@@ -193,6 +193,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$person_props['$username']     = $user->user_login;
 	$person_props['Account Type']  = 'Active';
 	$person_props['Account Status']= 'Active';
+	$person_props['Account Level'] = $subscription
 	$person_props['Recurring']	   = $recurring;
 	$person_props['Expiration']	   = $expiration;
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
@@ -203,9 +204,9 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$event_props['distinct_id']    = $user->user_login;
 	$event_props['Account Type']   = 'Citizen';
 	$event_props['Account Status'] = 'Active';
+	$event_props['Account Level']  = $subscription;
 	$event_props['Recurring']	   = $recurring;
 	$event_props['Expiration']	   = $expiration;
-	$event_props['Account Level']  = $subscription;
 	$event_props['Renewal']        = $renewal ? 'Yes' : 'No';
 	$event_props['Time Since Creation'] = human_time_diff( $user_time, current_time( 'timestamp' ) );
 
