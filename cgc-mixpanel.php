@@ -539,12 +539,19 @@ add_action( 'edd_update_payment_status', 'cgc_edd_track_purchase', 100, 3 );
 */
 function cgc_mixpanel_get_id_from_cookie() {
 	
-	echo "<pre>";print_r($_COOKIE);die();
-	
 	foreach($_COOKIE as $name => $value) {
+		
+		echo "<li>$name";
+		
 		if(strpos($name, 'mp_') === 0) {
+			
+			echo "<br/>Found $name: $value";
 
 			$cookie = json_decode(urldecode($value));
+
+			echo "<br/>Found ID: ";
+			die($cookie->distinct_id);
+						
 			return($cookie->distinct_id);
 
 			// old code below
