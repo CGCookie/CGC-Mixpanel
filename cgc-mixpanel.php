@@ -148,7 +148,6 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 	$person_props['Account Status'] = 'Free';
 	$person_props['newsletters']   = implode( ',', $newsletters );
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
-	$person_props['']			   = 
 
 	$event_props                   = array();
 	$event_props['distinct_id']    = $user->user_login;
