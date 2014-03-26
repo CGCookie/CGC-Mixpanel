@@ -63,7 +63,7 @@ function cgc_mixpanel_js() {
 	}
 
 	<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
-		// mixpanel.people.set_once( "Initial Referrer", $initial_referring_domain );
+		mixpanel.people.set_once( "Initial Referrer", $initial_referring_domain );
 		mixpanel.track( 'Page View: registration' );
 	<?php elseif( is_page( 'registration' ) && is_user_logged_in() && strpos( $_SERVER['HTTP_REFERER'], 'registration' ) === false ) : ?>
 
