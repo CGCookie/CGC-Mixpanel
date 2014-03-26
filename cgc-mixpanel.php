@@ -59,9 +59,10 @@ function cgc_mixpanel_js() {
 	}
 
 	<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
+		mixpanel.people.set("Country": $ip);
 		mixpanel.track( 'Page View: registration' );
 	<?php elseif( is_page( 'registration' ) && is_user_logged_in() && strpos( $_SERVER['HTTP_REFERER'], 'registration' ) === false ) : ?>
-
+		mixpanel.people.set("Country": $ip);
 		mixpanel.identify( '<?php echo $user_login; ?>' );
 		mixpanel.track( 'Page View: registration' );
 	<?php endif; ?>
@@ -147,6 +148,7 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 	$person_props['Account Status'] = 'Free';
 	$person_props['newsletters']   = implode( ',', $newsletters );
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
+	$person_props['']			   = 
 
 	$event_props                   = array();
 	$event_props['distinct_id']    = $user->user_login;
