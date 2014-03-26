@@ -538,23 +538,12 @@ add_action( 'edd_update_payment_status', 'cgc_edd_track_purchase', 100, 3 );
  * @return string $ip User's IP address
 */
 function cgc_mixpanel_get_id_from_cookie() {
-	
 	foreach($_COOKIE as $name => $value) {
-		
-		if(strpos($name, 'mp_') === 0) {
-			
+		if(strpos($name, 'mp_') === 0) {		
 			$cookie = json_decode(stripslashes(urldecode($value)));
 			return($cookie->distinct_id);
-
-			// old code below
-		    $chunk 	= explode(' ', stripslashes($value));
-		    $id 	= preg_replace('/^[A-Z0-9 \'.-]{1,255}$/', '', $chunk[1]);
-
-		    //var_dump($cleaned);
-		    return $id;
 		}
 	}
-
 }
 
 /**
