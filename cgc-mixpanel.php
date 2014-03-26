@@ -541,7 +541,7 @@ function cgc_mixpanel_get_id_from_cookie() {
 	
 	foreach($_COOKIE as $name => $value) {
 		
-		echo "<li>$name";
+//		echo "<li>$name";
 		
 		if(strpos($name, 'mp_') === 0) {
 			
@@ -549,7 +549,9 @@ function cgc_mixpanel_get_id_from_cookie() {
 
 			$cookie = json_decode(urldecode($value));
 
-			echo "<br/>Found ID: ";
+			echo "<br/>JSON dump: <pre>";
+			
+			print_r($cookie);
 			die($cookie->distinct_id);
 						
 			return($cookie->distinct_id);
