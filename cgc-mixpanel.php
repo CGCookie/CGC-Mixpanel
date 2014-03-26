@@ -148,8 +148,6 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 	$person_props['newsletters']   = implode( ',', $newsletters );
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
 
-	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
-
 	$event_props                   = array();
 	$event_props['distinct_id']    = $user->user_login;
 	$event_props['Account Type']   = 'Basic';
@@ -160,6 +158,8 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 
 	$mp->createAlias( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
 	$mp->identify( $user->user_login, cgc_mixpanel_get_id_from_cookie() );
+
+	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
 
 	$mp->track( 'Account Created', $event_props );
 }
