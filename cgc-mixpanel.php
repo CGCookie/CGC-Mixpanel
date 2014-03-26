@@ -32,7 +32,11 @@ function cgc_mixpanel_js() {
 	typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");for(g=0;g<i.length;g++)f(c,i[g]);
 	b._i.push([a,e,d])};b.__SV=1.2}})(document,window.mixpanel||[]);
 
-	mixpanel.init("<?php echo CGC_MIXPANEL_API; ?>");
+	mixpanel.init("<?php echo CGC_MIXPANEL_API; ?>", {
+		loaded: function() {
+			alert( mixpanel.get_property( "$initial_referring_domain" ) );
+		} 
+	});
 
 	var logged_in = cgc_get_query_vars()["logged-in"];
 
@@ -57,8 +61,6 @@ function cgc_mixpanel_js() {
 		});
 
 	}
-
-	// mixpanel.get_property( "$initial_referring_domain" );
 
 	<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
 		// mixpanel.people.set_once( "Initial Referrer", $initial_referring_domain );
