@@ -547,7 +547,7 @@ function cgc_mixpanel_get_id_from_cookie() {
 			
 			echo "<br/>Found $name: $value";
 
-			$cookie = json_decode(urldecode($value));
+			$cookie = json_decode(stripslashes(urldecode($value)));
 
 			echo "<br/>JSON dump: <pre>";
 			
