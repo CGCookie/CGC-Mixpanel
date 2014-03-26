@@ -49,29 +49,29 @@ function cgc_mixpanel_js() {
 
 			var logged_in = cgc_get_query_vars()["logged-in"];
 
-				if( logged_in ) {
-					jQuery.ajax({
-						type: "POST",
-						data: {
-							action: 'cgc_mixpanel_identify'
-						},
-						dataType: "json",
-						url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
-						success: function (response) {
+			if( logged_in ) {
+				jQuery.ajax({
+					type: "POST",
+					data: {
+						action: 'cgc_mixpanel_identify'
+					},
+					dataType: "json",
+					url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
+					success: function (response) {
 
-							// mixpanel.alias( response.distinct_id );
-							mixpanel.identify( response.user_login );
+						// mixpanel.alias( response.distinct_id );
+						mixpanel.identify( response.user_login );
 
-						}
-					}).fail(function (response) {
+					}
+				}).fail(function (response) {
 
-					}).done(function (response) {
+				}).done(function (response) {
 
-					});
-				} 
-		});
+				});
+			} 
 
-	}
+		}
+	});
 
 	function cgc_get_query_vars() {
 		var vars = [], hash;
