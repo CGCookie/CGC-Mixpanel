@@ -545,6 +545,8 @@ function cgc_mixpanel_get_id_from_cookie() {
 		    $chunk 	= explode(' ', stripslashes($value));
 		    $id 	= preg_replace('/^[A-Z0-9 \'.-]{1,255}$/', '', $chunk[1]);
 
+			echo "<!-- debug bart: $id -->";
+
 		    //var_dump($cleaned);
 		    return $id;
 		}
