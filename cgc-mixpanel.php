@@ -58,8 +58,10 @@ function cgc_mixpanel_js() {
 
 	}
 
+	mixpanel.get_property( "$initial_referring_domain" )
+
 	<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
-		// mixpanel.people.set("Initial Referrer", $initial_referring_domain);
+		mixpanel.people.set("Initial Referrer", $initial_referring_domain);
 		mixpanel.track( 'Page View: registration' );
 	<?php elseif( is_page( 'registration' ) && is_user_logged_in() && strpos( $_SERVER['HTTP_REFERER'], 'registration' ) === false ) : ?>
 
