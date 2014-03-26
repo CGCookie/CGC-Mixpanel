@@ -34,43 +34,44 @@ function cgc_mixpanel_js() {
 
 	mixpanel.init("<?php echo CGC_MIXPANEL_API; ?>", {
 		loaded: function() {
-			alert( mixpanel.get_property( "$initial_referring_domain" ) );
-		} 
-	});
+			mixpanel.get_property( "$initial_referring_domain" );
+		
+			<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
+				mixpanel.people.set_once( "Initial Referrer", $initial_referring_domain );
+				mixpanel.track( 'Page View: registration' );
+			<?php elseif( is_page( 'registration' ) && is_user_logged_in() && strpos( $_SERVER['HTTP_REFERER'], 'registration' ) === false ) : ?>
 
-	var logged_in = cgc_get_query_vars()["logged-in"];
+				mixpanel.identify( '<?php echo $user_login; ?>' );
+				// mixpanel.people.set_once( "Initial Referrer", $initial_referring_domain );
+				mixpanel.track( 'Page View: registration' );
+			<?php endif; ?>
+			
 
-	if( logged_in ) {
-		jQuery.ajax({
-			type: "POST",
-			data: {
-				action: 'cgc_mixpanel_identify'
-			},
-			dataType: "json",
-			url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
-			success: function (response) {
+			var logged_in = cgc_get_query_vars()["logged-in"];
 
-				// mixpanel.alias( response.distinct_id );
-				mixpanel.identify( response.user_login );
+				if( logged_in ) {
+					jQuery.ajax({
+						type: "POST",
+						data: {
+							action: 'cgc_mixpanel_identify'
+						},
+						dataType: "json",
+						url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
+						success: function (response) {
 
-			}
-		}).fail(function (response) {
+							// mixpanel.alias( response.distinct_id );
+							mixpanel.identify( response.user_login );
 
-		}).done(function (response) {
+						}
+					}).fail(function (response) {
 
+					}).done(function (response) {
+
+					});
+				} 
 		});
 
 	}
-
-	<?php if( is_page( 'registration' ) && ! is_user_logged_in() ) : ?>
-		mixpanel.people.set_once( "Initial Referrer", $initial_referring_domain );
-		mixpanel.track( 'Page View: registration' );
-	<?php elseif( is_page( 'registration' ) && is_user_logged_in() && strpos( $_SERVER['HTTP_REFERER'], 'registration' ) === false ) : ?>
-
-		mixpanel.identify( '<?php echo $user_login; ?>' );
-		// mixpanel.people.set_once( "Initial Referrer", $initial_referring_domain );
-		mixpanel.track( 'Page View: registration' );
-	<?php endif; ?>
 
 	function cgc_get_query_vars() {
 		var vars = [], hash;
