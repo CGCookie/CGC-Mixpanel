@@ -406,6 +406,30 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 }
 add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
 
+function cgc_track_file_download( $filename, $url, $type, $user_id, $post_id ) {
+
+	if( ! function_exists( 'rcp_get_subscription_name' ) )
+		return;
+
+	$user = get_userdata( $user_id );
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$mp->identify( $user->user_login );
+
+	$mp->people->increment( $user->user_login, "Number of Downloads", 1 );
+
+	$event_props                 = array();
+	$event_props['distinct_id']  = $user->user_login;
+	$event_props['Type']         = $type;
+	$event_props['File Name']    = $filename;
+	$event_props['Parent Name']  = get_the_title( $post_id );
+
+	$mp->track( 'Download File', $event_props );
+
+}
+add_action( 'cgc_file_download', 'cgc_track_file_download', 10, 5 );
+
 /*
 
 // Track when customers add items to the cart
