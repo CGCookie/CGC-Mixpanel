@@ -289,6 +289,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$rcp_payments = new RCP_Payments;
 
 	// Get the last payment of the user
+	$this_payment = $rcp_payments->get_payment( $payment_id );
 	$last_payment = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM " . rcp_get_payments_db_name() . " WHERE `user_id`='%d' AND id < '%d' ORDER BY id DESC LIMIT 1;", $args['user_id'], $payment_id ) );
 	$renewal      = ! empty( $last_payment );
 
@@ -304,7 +305,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$person_props['Account Status']= 'Active';
 	$person_props['Expiration']	   = $expiration;
 	$person_props['Payment Term'] = rcp_get_subscription( $user->ID );
-	$person_props['Last Payment Date'] = $renewal ? $last_payment[0]->date : '';
+	$person_props['Last Payment Date'] = $this_payment->date;
 
 	$mp->people->set( $user->user_login, $person_props );
 
@@ -313,7 +314,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$event_props['Value']        = $amount;
 	$event_props['Payment Term'] = rcp_get_subscription( $user->ID );
 	$event_props['Payment Type'] = $renewal ? 'Renewal' : 'Initial';
-	$event_props['Last Payment Date'] = $renewal ? $last_payment[0]->date : '';
+	$event_props['Last Payment Date'] = $this_payment->date;
 	$event_props['Expiration']	   = $expiration;
 
 	$mp->track( 'Membership Payment', $event_props );
