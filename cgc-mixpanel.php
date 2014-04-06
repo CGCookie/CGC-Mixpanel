@@ -336,6 +336,7 @@ function cgc_rcp_track_cancelled_paypal( $user_id ) {
 
 	$event_props                 = array();
 	$event_props['distinct_id']  = $user->user_login;
+	$event_props['Payment Term'] = $subscription;
 	$event_props['Reason']       = 'Cancelled';
 
 	$mp->track( 'Membership Termination', $event_props );
@@ -357,6 +358,7 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 
 	$event_props                 = array();
 	$event_props['distinct_id']  = $user->user_login;
+	$event_props['Payment Term'] = $subscription;
 	$event_props['Reason']       = 'Cancelled';
 
 	$mp->track( 'Membership Termination', $event_props );
