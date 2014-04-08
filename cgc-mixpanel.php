@@ -378,8 +378,10 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
 	$mp->identify( $user->user_login );
+	
+	$subscription = rcp_get_subscription( $user_id );
 
-	if( 'expired' === $new_status || 'cancelled' === $new_status ) {
+	if( 'expired' === $new_status ) {
 
 		$person_props                 = array();
 		$person_props['$first_name']  = $user->first_name;
@@ -388,19 +390,10 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['$username']    = $user->user_login;
 
 		if ( $subscription === 'Trial' ) {
-			if ('cancelled' === $new_status ) {
-				$person_props['Account Status'] = 'Trial Cancelled';
-			} else {
-				$person_props['Account Status'] = 'Trial Expired';
-			}
-		} else {
-
-			if ('cancelled' === $new_status ) {
-				$person_props['Account Status'] = 'Cancelled';
-			} else {
-				$person_props['Account Status'] = 'Expired';
-			}
-
+			$person_props['Account Status'] = 'Trial Expired';
+		}
+		else {
+			$person_props['Account Status'] = 'Expired';
 		}
 
 		$mp->people->set( $user->user_login, $person_props );
@@ -409,19 +402,10 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$event_props['distinct_id']  = $user->user_login;
 	
 		if ( $subscription === 'Trial' ) {
-			if ('cancelled' === $new_status ) {
-				$event_props['Account Status'] = 'Trial Cancelled';
-			} else {
 				$event_props['Account Status'] = 'Trial Expired';
-			}
-		} else {
-
-			if ('cancelled' === $new_status ) {
-				$event_props['Account Status'] = 'Cancelled';
-			} else {
-				$event_props['Account Status'] = 'Expired';
-			}
-
+		}
+		else {
+			$event_props['Account Status'] = 'Expired';
 		}
 
 		$mp->track( 'Membership Termination', $event_props );
