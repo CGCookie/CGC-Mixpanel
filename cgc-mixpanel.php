@@ -187,7 +187,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 
 	$subscription = rcp_get_subscription( $user_id );
 	$expiration   = rcp_get_expiration_date( $user_id );
-	$recurring    = rcp_is_recurring( $user_id );
+	$recurring    = rcp_is_rcurring( $user_id ) ? 'Yes' : 'No';
 	$rcp_payments = new RCP_Payments;
 	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
 	$user_time    = strtotime( $user->user_registered, current_time( 'timestamp' ) );
