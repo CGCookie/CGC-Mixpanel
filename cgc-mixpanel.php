@@ -122,6 +122,8 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 		$person_props['Account Type'] = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
 		$person_props['Payment Term'] = rcp_get_subscription( $user_id );
 		$person_props['Account Status'] = ucwords( rcp_get_status( $user_id ) );
+		$person_props['Recurring']    = rcp_is_recurring( $user_id ) ? 'Yes' : 'No';
+
 
 	}
 
@@ -187,7 +189,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 
 	$subscription = rcp_get_subscription( $user_id );
 	$expiration   = rcp_get_expiration_date( $user_id );
-	$recurring    = rcp_is_rcurring( $user_id ) ? 'Yes' : 'No';
+	$recurring    = rcp_is_recurring( $user_id ) ? 'Yes' : 'No';
 	$rcp_payments = new RCP_Payments;
 	$new_user     = $rcp_payments->last_payment_of_user( $user_id );
 	$user_time    = strtotime( $user->user_registered, current_time( 'timestamp' ) );
