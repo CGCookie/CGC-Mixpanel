@@ -28,8 +28,8 @@ function cgc_mixpanel_js() {
 	<!-- Mixpanel -->
 	<script type="text/javascript">
 
-	(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f);b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==
-	typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");for(g=0;g<i.length;g++)f(c,i[g]);
+	(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f);b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h] =function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==
+	typeof d?c=b[d] =[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");for(g=0;g<i.length;g++)f(c,i[g]);
 	b._i.push([a,e,d])};b.__SV=1.2}})(document,window.mixpanel||[]);
 
 	mixpanel.init("<?php echo CGC_MIXPANEL_API; ?>", {
@@ -115,7 +115,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	$person_props['$last_name']   = $user->last_name;
 	$person_props['$username']    = $user->user_login;
 	$person_props['$email']       = $user->user_email;
-	$person_props['$country_code']= cgc_mixpanel_get_ip();
+	$person_props['$country_code'] = cgc_mixpanel_get_ip();
 
 	if( function_exists( 'rcp_get_subscription' ) ) {
 
@@ -202,7 +202,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$person_props['$email']        = $user->user_email;
 	$person_props['$username']     = $user->user_login;
 	$person_props['Account Type']  = 'Citizen';
-	$person_props['Account Status']= 'Active';
+	$person_props['Account Status'] = 'Active';
 	$person_props['Account Level'] = $subscription;
 	$person_props['Recurring']	   = $recurring;
 	$person_props['Expiration']	   = $expiration;
@@ -251,7 +251,7 @@ function cgc_rcp_account_upgrade_via_gift( $user_id, $discount, $subscription ) 
 	$person_props['$email']        = $user->user_email;
 	$person_props['$username']     = $user->user_login;
 	$person_props['Account Type']  = 'Citizen';
-	$person_props['Account Status']= 'Active';
+	$person_props['Account Status'] = 'Active';
 	$person_props['Account Level'] = $subscription;
 	$person_props['Recurring']	   = 'No';
 	$person_props['Expiration']	   = $expiration;
@@ -304,7 +304,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$person_props['$email']        = $user->user_email;
 	$person_props['$username']     = $user->user_login;
 	$person_props['Account Type']  = 'Citizen';
-	$person_props['Account Status']= 'Active';
+	$person_props['Account Status'] = 'Active';
 	$person_props['Expiration']	   = $expiration;
 	$person_props['Payment Term'] = rcp_get_subscription( $user->ID );
 	$person_props['Last Payment Date'] = $this_payment->date;
@@ -332,7 +332,7 @@ function cgc_rcp_track_cancelled_paypal( $user_id ) {
 	$person_props['$last_name']    = $user->last_name;
 	$person_props['$email']        = $user->user_email;
 	$person_props['$username']     = $user->user_login;
-	$person_props['Account Status']= 'Cancelled';
+	$person_props['Account Status'] = 'Cancelled';
 
 	$mp->people->set( $user->user_login, $person_props );
 
@@ -354,7 +354,7 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 	$person_props['$last_name']    = $user->last_name;
 	$person_props['$email']        = $user->user_email;
 	$person_props['$username']     = $user->user_login;
-	$person_props['Account Status']= 'Cancelled';
+	$person_props['Account Status'] = 'Cancelled';
 
 	$mp->people->set( $user->user_login, $person_props );
 
@@ -387,21 +387,41 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		$person_props['$email']       = $user->user_email;
 		$person_props['$username']    = $user->user_login;
 
-		if ('cancelled' === $new_status ) {
-			$person_props['Account Status']= 'Cancelled';
+		if ( $subscription === 'Trial' ) {
+			if ('cancelled' === $new_status ) {
+				$person_props['Account Status'] = 'Trial Cancelled';
+			} else {
+				$person_props['Account Status'] = 'Trial Expired';
+			}
 		} else {
-			$person_props['Account Status']= 'Expired';
+
+			if ('cancelled' === $new_status ) {
+				$person_props['Account Status'] = 'Cancelled';
+			} else {
+				$person_props['Account Status'] = 'Expired';
+			}
+
 		}
 
 		$mp->people->set( $user->user_login, $person_props );
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user->user_login;
-
-		if ('cancelled' === $new_status ) {
-			$event_props['Reason']       = 'Cancelled';
+	
+		if ( $subscription === 'Trial' ) {
+			if ('cancelled' === $new_status ) {
+				$event_props['Account Status'] = 'Trial Cancelled';
+			} else {
+				$event_props['Account Status'] = 'Trial Expired';
+			}
 		} else {
-			$event_props['Reason']       = 'Expired';
+
+			if ('cancelled' === $new_status ) {
+				$event_props['Account Status'] = 'Cancelled';
+			} else {
+				$event_props['Account Status'] = 'Expired';
+			}
+
 		}
 
 		$mp->track( 'Membership Termination', $event_props );
@@ -446,7 +466,7 @@ function cgc_edd_track_added_to_cart( $download_id = 0, $options = array() ) {
 		$user = get_userdata( get_current_user_id() );
 
 		$person_props       = array();
-		$person_props['$ip']= edd_get_ip();
+		$person_props['$ip'] = edd_get_ip();
 		$mp->people->set( $user->user_login, $person_props );
 
 		$mp->identify( $user->user_login );
@@ -460,7 +480,7 @@ function cgc_edd_track_added_to_cart( $download_id = 0, $options = array() ) {
 	$event_props['$ip']          = edd_get_ip();
 	$event_props['session_id']   = EDD()->session->get_id();
 	$event_props['product_name'] = get_the_title( $download_id );
-	$event_props['product_price']= edd_get_cart_item_price( $download_id, $options );
+	$event_props['product_price'] = edd_get_cart_item_price( $download_id, $options );
 	if( function_exists( 'rcp_get_subscription' ) && is_user_logged_in() ) {
 		$event_props['subscription'] = rcp_get_subscription( get_current_user_id() );
 	}
