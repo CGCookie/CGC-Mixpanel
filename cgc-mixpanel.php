@@ -296,7 +296,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$renewal      = ! empty( $last_payment );
 
 	// get expiration
-	$expiration   = rcp_get_expiration_date( $user_id );
+	$expiration   = rcp_get_expiration_date( $user->ID );
 
 	$person_props                  = array();
 	$person_props['$first_name']   = $user->first_name;
