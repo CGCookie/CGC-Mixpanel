@@ -122,8 +122,8 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 		$person_props['Account Type'] = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
 		$person_props['Payment Term'] = rcp_get_subscription( $user_id );
 		$person_props['Account Status'] = ucwords( rcp_get_status( $user_id ) );
+		$person_props['Expiration']   = rcp_get_expiration_date( $user_id );
 		$person_props['Recurring']    = rcp_is_recurring( $user_id ) ? 'Yes' : 'No';
-
 
 	}
 
@@ -378,7 +378,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
 
 	$mp->identify( $user->user_login );
-	
+
 	$subscription = rcp_get_subscription( $user_id );
 
 	if( 'expired' === $new_status ) {
