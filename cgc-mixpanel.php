@@ -120,7 +120,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	if( function_exists( 'rcp_get_subscription' ) ) {
 
 		$person_props['Account Type'] = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
-		$person_props['Payment Term'] = rcp_get_subscription( $user_id );
+		$person_props['Account Level'] = rcp_get_subscription( $user_id );
 		$person_props['Account Status'] = ucwords( rcp_get_status( $user_id ) );
 		$person_props['Expiration']   = rcp_get_expiration_date( $user_id );
 		$person_props['Recurring']    = rcp_is_recurring( $user_id ) ? 'Yes' : 'No';
@@ -306,7 +306,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$person_props['Account Type']  = 'Citizen';
 	$person_props['Account Status'] = 'Active';
 	$person_props['Expiration']	   = $expiration;
-	$person_props['Payment Term'] = rcp_get_subscription( $user->ID );
+	$person_props['Account Level'] = rcp_get_subscription( $user->ID );
 	$person_props['Last Payment Date'] = $this_payment->date;
 
 	$mp->people->set( $user->user_login, $person_props );
@@ -314,7 +314,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$event_props                 = array();
 	$event_props['distinct_id']  = $user->user_login;
 	$event_props['Value']        = $amount;
-	$event_props['Payment Term'] = rcp_get_subscription( $user->ID );
+	$event_props['Account Level'] = rcp_get_subscription( $user->ID );
 	$event_props['Payment Type'] = $renewal ? 'Renewal' : 'Initial';
 	$event_props['Last Payment Date'] = $this_payment->date;
 	$event_props['Expiration']	   = $expiration;
@@ -338,7 +338,7 @@ function cgc_rcp_track_cancelled_paypal( $user_id ) {
 
 	$event_props                 = array();
 	$event_props['distinct_id']  = $user->user_login;
-	$event_props['Payment Term'] = $subscription;
+	$event_props['Account Level'] = $subscription;
 	$event_props['Reason']       = 'Cancelled';
 
 	$mp->track( 'Membership Termination', $event_props );
@@ -360,7 +360,7 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 
 	$event_props                 = array();
 	$event_props['distinct_id']  = $user->user_login;
-	$event_props['Payment Term'] = $subscription;
+	$event_props['Account Level'] = $subscription;
 	$event_props['Reason']       = 'Cancelled';
 
 	$mp->track( 'Membership Termination', $event_props );
