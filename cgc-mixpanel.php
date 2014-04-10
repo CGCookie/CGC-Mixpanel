@@ -400,6 +400,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 		$event_props                 = array();
 		$event_props['distinct_id']  = $user->user_login;
+		$event_props['Account Level'] = $subscription;
 	
 		if ( $subscription === 'Trial' ) {
 				$event_props['Account Status'] = 'Trial Expired';
