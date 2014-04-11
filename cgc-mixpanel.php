@@ -289,6 +289,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$mp->identify( $user->user_login );
 
 	$rcp_payments = new RCP_Payments;
+	$subscription = rcp_get_subscription( $user_id );
 
 	// Get the last payment of the user
 	$this_payment = $rcp_payments->get_payment( $payment_id );
@@ -322,6 +323,12 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 	$mp->track( 'Membership Payment', $event_props );
 
 	$mp->people->trackCharge( $user->user_login, $amount );
+
+	// reset downloads for monthly members
+	if  ( $subscription === 'Monthly' || $subscription === 'Citizen Monthly' ){
+		$mp->people->set( $user->user_login, "Number of Downloads", 0 );
+	}
+	
 }
 add_action( 'rcp_insert_payment', 'cgc_rcp_track_payment', 10, 3 );
 
