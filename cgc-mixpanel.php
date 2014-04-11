@@ -326,7 +326,7 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 
 	// reset downloads for monthly members
 	if  ( $subscription == 'Monthly' || $subscription == 'Citizen Monthly' ){
-		$mp->people->set( $user->user_login, "Number of Downloads", 0 );
+		$mp->people->set( $user->user_login, "Number of Downloads" => 0 );
 	}
 	
 }
