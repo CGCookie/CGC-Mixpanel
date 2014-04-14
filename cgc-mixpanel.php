@@ -135,6 +135,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 	if( function_exists( 'rcp_get_subscription' ) ) {
 		$event_props['Account Type']   = rcp_is_active( $user_id ) ? 'Citizen' : 'Basic';
 		$event_props['Account Status'] = ucwords( rcp_get_status( $user_id ) );
+		$event_props['Account Level']  = rcp_get_subscription( $user_id );
 	}
 	$mp->track( 'Login', $event_props );
 
