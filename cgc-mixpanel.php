@@ -373,7 +373,7 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 
 	$mp->track( 'Membership Termination', $event_props );
 }
-add_action( 'rcp_strip_customer.subscription.deleted', 'cgc_rcp_track_cancelled_stripe' );
+add_action( 'rcp_stripe_customer.subscription.deleted', 'cgc_rcp_track_cancelled_stripe' );
 
 
 function cgc_rcp_track_status_changes( $new_status, $user_id ) {
