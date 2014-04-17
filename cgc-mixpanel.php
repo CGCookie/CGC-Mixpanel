@@ -334,7 +334,9 @@ function cgc_rcp_track_payment( $payment_id = 0, $args = array(), $amount ) {
 add_action( 'rcp_insert_payment', 'cgc_rcp_track_payment', 10, 3 );
 
 function cgc_rcp_track_cancelled_paypal( $user_id ) {
-	$user                          = get_userdata( $user_id );
+	$user         = get_userdata( $user_id );
+	$subscription = rcp_get_subscription( $user_id );
+
 	$person_props                  = array();
 	$person_props['$first_name']   = $user->first_name;
 	$person_props['$last_name']    = $user->last_name;
@@ -357,6 +359,8 @@ function cgc_rcp_track_cancelled_stripe( $invoice ) {
 
 	$user_id                       = rcp_stripe_get_user_id( $invoice->customer );
 	$user                          = get_userdata( $user_id );
+	$subscription                  = rcp_get_subscription( $user_id );
+
 	$person_props                  = array();
 	$person_props['$first_name']   = $user->first_name;
 	$person_props['$last_name']    = $user->last_name;
