@@ -650,3 +650,28 @@ function cgc_mixpanel_get_current_page_url() {
 
 	return $page_url;
 }
+
+/**
+ *
+ */
+function cgc_mixpanel_new_comment_posted( $_comment_ID = 0, $_comment_status = 0 ) {
+	// Retrieve the information about the new comment
+	$comment = get_comment( $_comment_ID );
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user_id = get_current_user_id();
+	$user = get_userdata( $user_id );
+
+	$mp->identify( $user->user_login );
+
+	$mp->people->increment( $user->user_login, "Number of Comments", 1 );
+
+	$event_props                    = array();
+	$event_props['distinct_id']     = $user->user_login;
+	$event_props['Post Name']       = get_the_title( $comment->comment_post_ID );
+	$event_props['Comment Status']  = $_comment_status;
+
+	$mp->track( 'Comment Posted', $event_props );
+}
+add_action( 'comment_post', 'cgc_mixpanel_new_comment_posted', 12, 2 );
