@@ -674,8 +674,8 @@ function cgc_mixpanel_new_comment_posted( $_comment_ID = 0, $_comment_status = 0
 		$status = 'unknown';
 	}
 
-	echo "User login = " . $user->user_login . ", Comment ID = $_comment_ID, Comment status = $status";
-
+	$msg="User login = " . $user->user_login . ", Comment ID = $_comment_ID, Comment status = $status";
+	mail('bart.veldhuizen@gmail.com', 'MP tracking debug', $msg);
 
 
 	$mp->identify( $user->user_login );
