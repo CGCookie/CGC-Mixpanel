@@ -682,6 +682,7 @@ function cgc_mixpanel_new_comment_posted( $_comment_ID = 0, $_comment_status = 0
 	$event_props['distinct_id']     = $user->user_login;
 	$event_props['Post Name']       = get_the_title( $comment->comment_post_ID );
 	$event_props['Comment Status']  = $status;
+	$event_props['Comment Content'] = $comment->comment_content;	
 
 	$mp->track( 'Comment Posted', $event_props );
 }
