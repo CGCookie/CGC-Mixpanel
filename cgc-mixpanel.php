@@ -663,6 +663,17 @@ function cgc_mixpanel_new_comment_posted( $_comment_ID = 0, $_comment_status = 0
 	$user_id = get_current_user_id();
 	$user = get_userdata( $user_id );
 
+	// translate $_comment_status to something more readable
+	if( $_comment_status == 'spam' ) {
+		$status = 'spam';
+	} elseif( $_comment_status == 0 ) {
+		$status = 'awaiting moderation';
+	} elseif( $_comment_status == 1 ) {
+		$status = 'approved';
+	} else {
+		$status = 'unknown';
+	}
+
 	$mp->identify( $user->user_login );
 
 	$mp->people->increment( $user->user_login, "Number of Comments", 1 );
@@ -670,7 +681,7 @@ function cgc_mixpanel_new_comment_posted( $_comment_ID = 0, $_comment_status = 0
 	$event_props                    = array();
 	$event_props['distinct_id']     = $user->user_login;
 	$event_props['Post Name']       = get_the_title( $comment->comment_post_ID );
-	$event_props['Comment Status']  = $_comment_status;
+	$event_props['Comment Status']  = $status;
 
 	$mp->track( 'Comment Posted', $event_props );
 }
