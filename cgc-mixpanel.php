@@ -674,6 +674,10 @@ function cgc_mixpanel_new_comment_posted( $_comment_ID = 0, $_comment_status = 0
 		$status = 'unknown';
 	}
 
+	die( "User login = " . $user->user_login . ", Comment ID = $_comment_ID, Comment status = $status");
+
+
+
 	$mp->identify( $user->user_login );
 
 	$mp->people->increment( $user->user_login, "Number of Comments", 1 );
