@@ -686,4 +686,4 @@ function cgc_mixpanel_new_comment_posted( $_comment_ID = 0, $_comment_status = 0
 
 	$mp->track( 'Comment Posted', $event_props );
 }
-add_action( 'comment_post', 'cgc_mixpanel_new_comment_posted', 12, 2 );
+add_action( 'comment_post', 'cgc_mixpanel_new_comment_posted', 5, 2 );
