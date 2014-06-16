@@ -445,7 +445,8 @@ function cgc_track_file_download( $filename, $url, $type, $user_id, $post_id ) {
 	$event_props['Type']         = $type;
 	$event_props['File Name']    = $filename;
 	$event_props['Parent Name']  = get_the_title( $post_id );
-
+	$event_props['Site Name']    = get_option( 'blogname' );
+	
 	$mp->track( 'Download File', $event_props );
 
 }
