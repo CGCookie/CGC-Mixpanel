@@ -445,7 +445,8 @@ function cgc_track_file_download( $filename, $url, $type, $user_id, $post_id ) {
 	$event_props['Type']         = $type;
 	$event_props['File Name']    = $filename;
 	$event_props['Parent Name']  = get_the_title( $post_id );
-
+	$event_props['Site Name']    = get_option( 'blogname' );
+	
 	$mp->track( 'Download File', $event_props );
 
 }
@@ -683,6 +684,7 @@ function cgc_mixpanel_new_comment_posted( $_comment_ID = 0, $_comment_status = 0
 	$event_props['Post Name']       = get_the_title( $comment->comment_post_ID );
 	$event_props['Comment Status']  = $status;
 	$event_props['Comment Content'] = $comment->comment_content;	
+	$event_props['Site Name']		= get_option( 'blogname' );	
 
 	$mp->track( 'Comment Posted', $event_props );
 }
