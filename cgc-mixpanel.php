@@ -18,6 +18,10 @@ if( ! class_exists( 'Mixpanel' ) ) {
 	require dirname( __FILE__ ) . '/mixpanel/lib/Mixpanel.php';
 }
 
+if( ! class_exists( 'Mixpanel' ) ) {
+	require dirname( __FILE__ ) . '/mixpanel/lib/Mixpanel.php';
+}
+
 
 function cgc_mixpanel_js() {
 
@@ -689,3 +693,77 @@ function cgc_mixpanel_new_comment_posted( $_comment_ID = 0, $_comment_status = 0
 	$mp->track( 'Comment Posted', $event_props );
 }
 add_action( 'comment_post', 'cgc_mixpanel_new_comment_posted', 5, 2 );
+
+
+/**
+ *
+ */
+
+function cgc_mixpanel_quiz_taken( $quiz_id, $total_questions, $correct_questions, $passed ) {
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user_id = get_current_user_id();
+	$user = get_userdata( $user_id );
+
+	$mp->identify( $user->user_login );
+
+	$mp->people->increment( $user->user_login, "Quizzes taken", 1 );
+
+	$event_props                    		= array();
+	$event_props['distinct_id']     		= $user->user_login;
+	//$event_props['Course']          = get_the_title( $comment->comment_post_ID );
+	$event_props['Quiz title']				= get_the_title( $quiz_id);
+	$event_props['Quiz total questions']	= $total_questions;
+	$event_props['Quiz correct questions']	= $correct_questions;
+	$event_props['Quiz passed']				= $passed?'Yes':'No';
+	$event_props['Site Name']				= get_option( 'blogname' );	
+
+	$mp->track( 'Quiz taken', $event_props );
+}
+
+/**
+ *
+ */
+function cgc_mixpanel_xp_awarded( $xp_type, $xp_amount ) {
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user_id = get_current_user_id();
+	$user = get_userdata( $user_id );
+
+	$mp->identify( $user->user_login );
+
+	$mp->people->increment( $user->user_login, "XP Events", 1 );
+	$mp->people->increment( $user->user_login, "XP Total", $xp_amount );
+
+	$event_props                    = array();
+	$event_props['distinct_id']     = $user->user_login;
+	$event_props['XP Type']			= $xp_type;
+	$event_props['XP Awarded']		= $xp_amount;
+	$event_props['Site Name']		= get_option( 'blogname' );	
+
+	$mp->track( 'XP Awarded', $event_props );
+}
+
+/**
+ *
+ */
+function cgc_mixpanel_xp_level_up( $level ) {
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user_id = get_current_user_id();
+	$user = get_userdata( $user_id );
+
+	$mp->identify( $user->user_login );
+
+	$mp->people->set( $user->user_login, array( "XP Level" => $level ) );
+
+	$event_props                    = array();
+	$event_props['distinct_id']     = $user->user_login;
+	$event_props['Level']			= $level;
+	$event_props['Site Name']		= get_option( 'blogname' );	
+
+	$mp->track( 'XP Level Up', $event_props );
+}
