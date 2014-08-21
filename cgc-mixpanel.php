@@ -127,7 +127,7 @@ function cgc_mixpanel_user_login( $logged_in_cookie, $expire, $expiration, $user
 
 	}
 
-	$mp->people->set( $user->user_login, $person_props, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
+	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
 
 	$event_props                  = array();
 	$event_props['distinct_id']   = $user->user_login;
