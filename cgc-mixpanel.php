@@ -758,7 +758,11 @@ function cgc_mixpanel_xp_level_up( $level ) {
 
 	$mp->identify( $user->user_login );
 
-	$mp->people->set( $user->user_login, array( "XP Level" => $level ) );
+	$person_props                  		= array();
+	$person_props['XP Level']      		= $level;
+	$person_props['XP Level Up Date']   = date( 'Y-m-d H:i:s' );
+	
+	$mp->people->set( $user->user_login, $person_props );
 
 	$event_props                    = array();
 	$event_props['distinct_id']     = $user->user_login;
