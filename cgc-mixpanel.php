@@ -220,7 +220,6 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$event_props['Account Type']   = 'Citizen';
 	$event_props['Account Status'] = 'Active';
 	$event_props['Account Level']  = $subscription;
-	$event_props['Redeemed Gift']  = 'No';
 	$event_props['Recurring']	   = $recurring;
 	$event_props['Expiration']	   = $expiration;
 	$event_props['Renewal']        = $renewal ? 'Yes' : 'No';
@@ -262,7 +261,6 @@ function cgc_rcp_account_upgrade_via_gift( $user_id, $discount, $subscription ) 
 	$person_props['Recurring']	   = 'No';
 	$person_props['Expiration']	   = $expiration;
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
-	$person_props['Redeemed Gift'] = 'Yes';
 
 	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
 
@@ -270,10 +268,9 @@ function cgc_rcp_account_upgrade_via_gift( $user_id, $discount, $subscription ) 
 	$event_props['distinct_id']    = $user->user_login;
 	$event_props['Account Type']   = 'Citizen';
 	$event_props['Account Status'] = 'Active';
-	$event_props['Account Level']  = $subscription;
-	$event_props['Redeemed Gift']  = 'Yes';
 	$event_props['Recurring']	   = 'No';
 	$event_props['Expiration']	   = $expiration;
+	$event_props['Account Level']  = $subscription;
 	$event_props['Renewal']        = $renewal ? 'Yes' : 'No';
 	$event_props['Time Since Creation'] = human_time_diff( $user_time, current_time( 'timestamp' ) );
 
@@ -400,32 +397,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 	$subscription = rcp_get_subscription( $user_id );
 
-	// if ( 'active' === $new_status ) {
-
-	// 	$person_props                 = array();
-	// 	$person_props['$first_name']  = $user->first_name;
-	// 	$person_props['$last_name']   = $user->last_name;
-	// 	$person_props['$email']       = $user->user_email;
-	// 	$person_props['$username']    = $user->user_login;
-	// 	$person_props['Expiration']	   = $expiration;
-
-
-	// 	$person_props['Account Status'] = 'Active';
-		
-	// 	$mp->people->set( $user->user_login, $person_props );
-
-	// 	$event_props                 = array();
-	// 	$event_props['distinct_id']  = $user->user_login;
-	// 	$event_props['Account Level'] = $subscription;
-	
-	// 	$event_props['Account Status'] = 'Active';
-
-	// 	$event_props['Expiration']	   = $expiration;
-
-	// 	$mp->track( 'Account Upgraded', $event_props );
-	// }
-
-	if ( 'expired' === $new_status ) {
+	if( 'expired' === $new_status ) {
 
 		$person_props                 = array();
 		$person_props['$first_name']  = $user->first_name;
@@ -454,33 +426,9 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		}
 
 		$mp->track( 'Membership Termination', $event_props );
-	}
-
-	elseif ( 'cancelled' === $new_status ) {
-
-		$person_props                 = array();
-		$person_props['$first_name']  = $user->first_name;
-		$person_props['$last_name']   = $user->last_name;
-		$person_props['$email']       = $user->user_email;
-		$person_props['$username']    = $user->user_login;
-
-
-		$person_props['Account Status'] = 'Cancelled';
-		
-		$mp->people->set( $user->user_login, $person_props );
-
-		$event_props                 = array();
-		$event_props['distinct_id']  = $user->user_login;
-		$event_props['Account Level'] = $subscription;
-	
-		$event_props['Account Status'] = 'Cancelled';
-
-		$mp->track( 'Membership Termination', $event_props );
-
 
 	}
 }
-
 add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
 
 function cgc_track_file_download( $filename, $url, $type, $user_id, $post_id ) {
