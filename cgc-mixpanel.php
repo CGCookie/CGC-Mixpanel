@@ -397,32 +397,32 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 	$subscription = rcp_get_subscription( $user_id );
 
-	if ( 'active' === $new_status ) {
+	// if ( 'active' === $new_status ) {
 
-		$person_props                 = array();
-		$person_props['$first_name']  = $user->first_name;
-		$person_props['$last_name']   = $user->last_name;
-		$person_props['$email']       = $user->user_email;
-		$person_props['$username']    = $user->user_login;
-		$person_props['Expiration']	   = $expiration;
+	// 	$person_props                 = array();
+	// 	$person_props['$first_name']  = $user->first_name;
+	// 	$person_props['$last_name']   = $user->last_name;
+	// 	$person_props['$email']       = $user->user_email;
+	// 	$person_props['$username']    = $user->user_login;
+	// 	$person_props['Expiration']	   = $expiration;
 
 
-		$person_props['Account Status'] = 'Active';
+	// 	$person_props['Account Status'] = 'Active';
 		
-		$mp->people->set( $user->user_login, $person_props );
+	// 	$mp->people->set( $user->user_login, $person_props );
 
-		$event_props                 = array();
-		$event_props['distinct_id']  = $user->user_login;
-		$event_props['Account Level'] = $subscription;
+	// 	$event_props                 = array();
+	// 	$event_props['distinct_id']  = $user->user_login;
+	// 	$event_props['Account Level'] = $subscription;
 	
-		$event_props['Account Status'] = 'Active';
+	// 	$event_props['Account Status'] = 'Active';
 
-		$event_props['Expiration']	   = $expiration;
+	// 	$event_props['Expiration']	   = $expiration;
 
-		$mp->track( 'Account Upgraded', $event_props );
-	}
+	// 	$mp->track( 'Account Upgraded', $event_props );
+	// }
 
-	elseif( 'expired' === $new_status ) {
+	if ( 'expired' === $new_status ) {
 
 		$person_props                 = array();
 		$person_props['$first_name']  = $user->first_name;
