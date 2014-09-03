@@ -426,6 +426,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 		}
 
 		$mp->track( 'Membership Termination', $event_props );
+	}
 
 	elseif ( 'cancelled' === $new_status ) {
 
@@ -451,6 +452,7 @@ function cgc_rcp_track_status_changes( $new_status, $user_id ) {
 
 	}
 }
+
 add_action( 'rcp_set_status', 'cgc_rcp_track_status_changes', 10, 2 );
 
 function cgc_track_file_download( $filename, $url, $type, $user_id, $post_id ) {
