@@ -261,6 +261,7 @@ function cgc_rcp_account_upgrade_via_gift( $user_id, $discount, $subscription ) 
 	$person_props['Recurring']	   = 'No';
 	$person_props['Expiration']	   = $expiration;
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
+	$person_props['Redeemed Gift'] = 'Yes';
 
 	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
 
@@ -268,6 +269,7 @@ function cgc_rcp_account_upgrade_via_gift( $user_id, $discount, $subscription ) 
 	$event_props['distinct_id']    = $user->user_login;
 	$event_props['Account Type']   = 'Citizen';
 	$event_props['Account Status'] = 'Active';
+	$event_props['Redeemed Gift']  = 'Yes';
 	$event_props['Recurring']	   = 'No';
 	$event_props['Expiration']	   = $expiration;
 	$event_props['Account Level']  = $subscription;
