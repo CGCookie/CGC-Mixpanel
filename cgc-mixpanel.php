@@ -220,6 +220,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$event_props['Account Type']   = 'Citizen';
 	$event_props['Account Status'] = 'Active';
 	$event_props['Account Level']  = $subscription;
+	$event_props['Redeemed Gift']  = 'No';
 	$event_props['Recurring']	   = $recurring;
 	$event_props['Expiration']	   = $expiration;
 	$event_props['Renewal']        = $renewal ? 'Yes' : 'No';
@@ -269,10 +270,10 @@ function cgc_rcp_account_upgrade_via_gift( $user_id, $discount, $subscription ) 
 	$event_props['distinct_id']    = $user->user_login;
 	$event_props['Account Type']   = 'Citizen';
 	$event_props['Account Status'] = 'Active';
+	$event_props['Account Level']  = $subscription;
 	$event_props['Redeemed Gift']  = 'Yes';
 	$event_props['Recurring']	   = 'No';
 	$event_props['Expiration']	   = $expiration;
-	$event_props['Account Level']  = $subscription;
 	$event_props['Renewal']        = $renewal ? 'Yes' : 'No';
 	$event_props['Time Since Creation'] = human_time_diff( $user_time, current_time( 'timestamp' ) );
 
