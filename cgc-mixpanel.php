@@ -217,8 +217,8 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
 	
 
-	if( ! empty( $_REQUEST['rcp-discount'])){ 
-		$discount = sanitize_text_field( $_REQUEST['rcp-discount']);
+	if( ! empty( $_REQUEST['rcp_discount'])){ 
+		$discount = sanitize_text_field( $_REQUEST['rcp_discount']);
 		}
 	
 	$mp->people->append( $user->user_login, "Discount Codes:", $discount );
