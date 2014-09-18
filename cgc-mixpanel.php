@@ -181,7 +181,7 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 add_action( 'cgc_rcp_account_created', 'cgc_rcp_track_account_created', 10, 2 );
 
 // Track account upgrade
-function cgc_rcp_account_upgrade( $user_id, $discount, $data ) {
+function cgc_rcp_account_upgrade( $user_id, $data ) {
 
 	if(  ! function_exists( 'rcp_get_subscription_name' ) )
 		return;
@@ -200,6 +200,7 @@ function cgc_rcp_account_upgrade( $user_id, $discount, $data ) {
 	$user_time    = strtotime( $user->user_registered, current_time( 'timestamp' ) );
 	$renewal      = ! empty( $new_user );
 	$upgrade      = $user_time < $ten_min_ago && ! $renewal ? true : false;
+	$discount     = '';
 
 	$person_props                  = array();
 	$person_props['$first_name']   = $user->first_name;
@@ -214,6 +215,12 @@ function cgc_rcp_account_upgrade( $user_id, $discount, $data ) {
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
 
 	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
+	
+
+	if( ! empty( $_REQUEST['rcp-discount'])){ 
+		$discount = sanitize_text_field( $_REQUEST['rcp-discount']);
+		}
+	
 	$mp->people->append( $user->user_login, "Discount Codes:", $discount );
 
 	$event_props                   = array();
