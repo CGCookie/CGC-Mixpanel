@@ -229,7 +229,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$event_props['Account Status'] = 'Active';
 	$event_props['Account Level']  = $subscription;
 	$event_props['Redeemed Gift']  = 'No';
-	$event_props['Discount Code:'] = $discount;
+	$event_props['Discount Code'] = $discount;
 	$event_props['Recurring']	   = $recurring;
 	$event_props['Expiration']	   = $expiration;
 	$event_props['Renewal']        = $renewal ? 'Yes' : 'No';
