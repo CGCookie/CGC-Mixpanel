@@ -181,7 +181,7 @@ function cgc_rcp_track_account_created( $user_id, $newsletters ) {
 add_action( 'cgc_rcp_account_created', 'cgc_rcp_track_account_created', 10, 2 );
 
 // Track account upgrade
-function cgc_rcp_account_upgrade( $user_id, $data ) {
+function cgc_rcp_account_upgrade( $user_id, $discount, $data ) {
 
 	if(  ! function_exists( 'rcp_get_subscription_name' ) )
 		return;
@@ -214,6 +214,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$person_props['$created']      = date( 'Y-m-d H:i:s' );
 
 	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
+	$mp->people->append( $user->user_login, "Discount Codes:", $discount );
 
 	$event_props                   = array();
 	$event_props['distinct_id']    = $user->user_login;
@@ -221,6 +222,7 @@ function cgc_rcp_account_upgrade( $user_id, $data ) {
 	$event_props['Account Status'] = 'Active';
 	$event_props['Account Level']  = $subscription;
 	$event_props['Redeemed Gift']  = 'No';
+	$event_props['Discount Code:'] = $discount
 	$event_props['Recurring']	   = $recurring;
 	$event_props['Expiration']	   = $expiration;
 	$event_props['Renewal']        = $renewal ? 'Yes' : 'No';
