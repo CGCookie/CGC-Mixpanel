@@ -49,6 +49,16 @@ function cgc_mixpanel_js() {
 				// mixpanel.people.set_once( "Initial Referrer", $initial_referring_domain );
 				mixpanel.track( 'Page View: registration' );
 			<?php endif; ?>
+
+			<?php if( is_page( 'membership' ) && ! is_user_logged_in() ) : ?>
+				mixpanel.people.set_once( "Initial Referrer", referrer );
+				mixpanel.track( 'Page View: membership' );
+			<?php elseif( is_page( 'membership' ) && is_user_logged_in() && strpos( $_SERVER['HTTP_REFERER'], 'membership' ) === false ) : ?>
+
+				mixpanel.identify( '<?php echo $user_login; ?>' );
+				// mixpanel.people.set_once( "Initial Referrer", $initial_referring_domain );
+				mixpanel.track( 'Page View: membership' );
+			<?php endif; ?>
 			
 
 			var logged_in = cgc_get_query_vars()["logged-in"];
