@@ -285,7 +285,6 @@ function cgc_rcp_account_upgrade_via_gift( $user_id, $discount, $subscription ) 
 	}
 	$person_props['Recurring']	   = 'No';
 	$person_props['Expiration']	   = $expiration;
-	$person_props['$created']      = date( 'Y-m-d H:i:s' );
 
 	$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
 
