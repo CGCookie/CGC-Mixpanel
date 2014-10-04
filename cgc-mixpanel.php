@@ -7,6 +7,7 @@
  * Version: 1.0
  */
 
+include 'cgc-edu-mixpnael-webhooks.php';
 
 if( strpos( home_url(), 'staging' ) !== false ) {
 	define( 'CGC_MIXPANEL_API', '207a9aafeae87dcf4a66c3b5490bbbc9' );
@@ -504,6 +505,35 @@ function cgc_track_file_download( $filename, $url, $type, $user_id, $post_id ) {
 
 }
 add_action( 'cgc_file_download', 'cgc_track_file_download', 10, 5 );
+
+/*
+// Helpscout Notification Events 
+*/
+
+function cgc_helpscount_conversation_created($email, $number) {
+
+	$mp = Mixpanel::getInstance( CGC_MIXPANEL_API );
+
+	$user = get_user_by( 'email', $email );
+
+	if ($user)	 {
+
+		$person_props                  = array();
+		$person_props['$email']        = $user->user_email;
+		
+		$event_props                   = array();
+		$event_props['distinct_id']    = $user->user_login;
+		$event_props['Email']          = $user->user_email;
+		$event_props['Ticket Number']  = $number;
+
+		$mp->people->set( $user->user_login, $person_props, array( '$ip' => cgc_mixpanel_get_ip() ) );
+		$mp->people->increment( $user->user_login, "Number of Tickets", 1 );
+
+		$mp->track( 'Support Ticket Created', $event_props );
+	}
+}
+
+
 
 /*
 
