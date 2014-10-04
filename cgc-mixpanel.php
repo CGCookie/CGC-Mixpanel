@@ -7,7 +7,7 @@
  * Version: 1.0
  */
 
-include 'cgc-edu-mixpnael-webhooks.php';
+include 'cgc-edu-mixpanel-webhooks.php';
 
 if( strpos( home_url(), 'staging' ) !== false ) {
 	define( 'CGC_MIXPANEL_API', '207a9aafeae87dcf4a66c3b5490bbbc9' );
