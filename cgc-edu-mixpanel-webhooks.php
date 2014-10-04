@@ -26,7 +26,7 @@ function cgc_mixpanel_helpscount_listener() {
 		// Conversation created in Helpscout
 		cgc_helpscount_conversation_created($webhook_data->customer->email, $webhook_data->ticket->number);
 
-
+		die("1");
 
 		} 
  
