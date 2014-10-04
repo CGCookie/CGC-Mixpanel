@@ -31,6 +31,7 @@ function cgc_mixpanel_helpscount_listener() {
 		} 
  
 	}
+	die("-1");
 
 }
 add_action('init', 'cgc_mixpanel_helpscount_listener')
