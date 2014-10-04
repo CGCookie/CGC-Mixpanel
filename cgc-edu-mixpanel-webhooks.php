@@ -6,22 +6,20 @@ function cgc_verify_helpscout($data, $signature) {
 	return $signature == $calculated;
 }
 
-$signature = $_SERVER['HTTP_X_HELPSCOUT_SIGNATURE'];
-$data = file_get_contents('php://input');
 
 
 function cgc_mixpanel_helpscount_listener() {
 
-	if (cgc_verify_helpscout($data, $signature)) {
-		// do something
+	if ( isset( $_GET['listener'] ) && $_GET['listener'] == 'cgc-helpscout' ) {
+		
+		$signature = $_SERVER['HTTP_X_HELPSCOUT_SIGNATURE'];
+		$data = file_get_contents('php://input');
 
-		if ( isset( $_GET['listener'] ) && $_GET['listener'] == 'cgc-helpscout' ) {
+		if (cgc_verify_helpscout($data, $signature)) {
  
 		// retrieve the request's body and parse it as JSON
 		$body         = @file_get_contents( 'php://input' );
 		$webhook_data = json_decode( $body );
-
-
 
 		// Conversation created in Helpscout
 		cgc_helpscount_conversation_created($webhook_data->customer->email, $webhook_data->ticket->number);
@@ -30,8 +28,8 @@ function cgc_mixpanel_helpscount_listener() {
 
 		} 
  
+		die("-1");
 	}
-	die("-1");
 
 }
 add_action('init', 'cgc_mixpanel_helpscount_listener')
