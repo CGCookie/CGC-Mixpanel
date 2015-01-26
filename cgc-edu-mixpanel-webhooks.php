@@ -11,12 +11,12 @@ function cgc_verify_helpscout($data, $signature) {
 function cgc_mixpanel_helpscount_listener() {
 
 	if ( isset( $_GET['listener'] ) && $_GET['listener'] == 'cgc-helpscout' ) {
-		
+
 		$signature = $_SERVER['HTTP_X_HELPSCOUT_SIGNATURE'];
 		$data = file_get_contents('php://input');
 
 		if (cgc_verify_helpscout($data, $signature)) {
- 
+
 		// retrieve the request's body and parse it as JSON
 		$body         = @file_get_contents( 'php://input' );
 		$webhook_data = json_decode( $body );
@@ -26,10 +26,10 @@ function cgc_mixpanel_helpscount_listener() {
 
 		die("1");
 
-		} 
- 
+		}
+
 		die("-1");
 	}
 
 }
-add_action('init', 'cgc_mixpanel_helpscount_listener')
+add_action('init', 'cgc_mixpanel_helpscount_listener');
